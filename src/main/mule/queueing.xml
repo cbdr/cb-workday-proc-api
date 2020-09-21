@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<jms:config name="JMS_Config" doc:name="JMS Config" doc:id="8949bd3c-9d98-4413-8423-40393d3c3549" >
+		<jms:active-mq-connection username="${queue.username}" password="${secure::queue.password}">
+			<jms:factory-configuration brokerUrl="${queue.url}" maxRedelivery="${queue.consumer.maxRedeliveries}" />
+		</jms:active-mq-connection>
+	</jms:config>
+	<flow name="queueingFlow" doc:id="4c4441c0-d0b1-4e7c-87c3-b761668b20da" >
+		<logger level="INFO" doc:name="Begin transation" doc:id="fd35306b-96b7-459c-9467-36583b4be94b" message="Begin transaction at: #[flow.name], on correlationId: #[correlationId]" />
+		<ee:transform doc:name="Adding isApplink" doc:id="f1926fe0-0040-4922-9aa5-f63c99fc7b6b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload ++ {isAppLink: (attributes.headers.isAppLink as Boolean) default null}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<jms:publish doc:id="eccba11c-746f-4579-ab1c-d4e2d880f238" config-ref="JMS_Config" destination="${queue.name}" doc:name="Publish" />
+		<ee:transform doc:name="Mappping JSON Response" doc:id="4b986993-f626-41b8-b4a6-159504f3b61c" >
+			<ee:message >
+				<ee:set-payload resource="dw/sync-response.dwl" />
+			</ee:message>
+		</ee:transform>
+		<choice doc:name="Choice: candidate already exists or Applink?" doc:id="e2ded2b8-ab55-463b-999f-78d201b7c0f7" >
+			<when expression="#[sizeOf(payload)==0 or (vars.originalPayload.isAppLink? and vars.originalPayload.isAppLink==true)]" >
+				<flow-ref doc:name="Flow Reference" doc:id="7a540dce-7a75-4316-9d84-90b75ceaa8b5" name="Create_Candidate" />
+			</when>
+			<otherwise >
+				<flow-ref doc:name="Flow Reference" doc:id="961fb10d-be43-41f4-b12d-173b9cf23db5" name="Get_Applicants" />
+				<choice doc:name="Choice: Job Application data contains the job" doc:id="874d61f8-df65-4a20-8f49-a4c74c4ea0be" >
+					<when expression="(sizeOf(flatten(vars.candidate.applications.*jobs)) != 0 and (vars.jobId != null) and (sizeOf(vars.candidate.applications filter (($.jobs[0].id==(vars.jobId as Number)) and (($.prospect==false and vars.originalPayload.isAppLink==true) or ($.prospect==true and (vars.originalPayload.isAppLink==null or vars.originalPayload.isAppLink==false)))))==0 default true)) or (sizeOf(flatten(vars.candidate.applications.*jobs)) == 0 and (vars.jobId != null)) or (sizeOf(flatten(vars.candidate.applications.*jobs)) != 0 and not (vars.jobId != null))" >
+						<flow-ref doc:name="Flow Reference" doc:id="9bd6af55-4138-4a2d-8291-ea902df5d898" name="upload_resume" />
+					</when>
+					<otherwise >
+						<flow-ref doc:name="Flow Reference" doc:id="6cd496ea-e513-43ba-90df-298272c11e69" name="Create_Candidate" />
+					</otherwise>
+				</choice>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

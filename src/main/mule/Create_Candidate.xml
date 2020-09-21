@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="Create_Candidate" doc:id="1b01bc55-12b4-4e43-932e-7846fc60b99f" >
+		<choice doc:name="Choice" doc:id="db02765e-04ca-4592-a73e-c038d13afefb" >
+			<when expression="#[(vars.originalPayload.candidate.documents.requisition.requisitionId? and vars.originalPayload.candidate.documents.requisition.requisitionId == true)]" >
+				<flow-ref doc:name="Flow Reference" doc:id="f6b1edd5-30d5-47c5-8db8-95bae369cf52" name="Get_Recruiting_Job_Requisition" />
+			</when>
+			<otherwise >
+				<choice doc:name="Choice" doc:id="84476548-833a-4514-b64b-55101fa0f3c0" >
+					<when expression="#[(vars.originalPayload.candidate.Evergreen.requisition.requisitionId? and vars.originalPayload.candidate.Evergreen.requisition.requisitionId == true)]" >
+						<flow-ref doc:name="Flow Reference" doc:id="da53c537-2869-449f-96ea-a74db0770003" name="Get_Recruiting_Evergreen_Requisition" />
+					</when>
+				</choice>
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Transform Message" doc:id="7eaccd5d-534c-4c05-9e21-7dc248eb2b03" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="d30597b6-bb6b-488f-a817-ea0541b3b708" name="Put_Applicant" />
+	</flow>
+</mule>
