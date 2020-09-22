@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="put-candidatesFlow" doc:id="6faa42cf-bce2-4c8e-b4a8-fc21a1853f1a" >
+		<http:request method="GET" doc:name="Put Candidates Request " doc:id="dd68e382-fe94-40cf-88c0-d4799d96afac" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.recruiting.create-applicant-uri}" >
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : vars.client_secret,
+	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"client_id" : vars.client_id,
+	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
+	"userName" : p('cb-workday-sys-api.headers.userName')
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="e27dda71-7f94-4334-8376-a7eb45cbdfd8" message="#[payload]"/>
+	</flow>
+</mule>

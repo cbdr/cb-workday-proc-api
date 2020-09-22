@@ -1,9 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration_workday1" doc:name="HTTP Request configuration" doc:id="e494efe4-752e-4a03-9333-44351774c106" responseTimeout="${http.requestTimeout}" >
+		<http:request-connection protocol="${http.protocol}" host="${api.host}" port="${api.port}" />
+	</http:request-config>
+	<flow name="Create-candidatesFlow" doc:id="86a30419-5461-413d-81b2-43af858f7a39" >
+		<choice doc:name="Is Job Requistions exists?" doc:id="ae285c55-873d-43a4-bd30-5e85f12a393c" >
+			<when expression="vars.IsJobRequistionsExists.Get_Job_Requistions != null" >
+				<http:request method="GET" doc:name="Get Job Requistions Request" doc:id="be2dff1a-04ef-4fd6-bbb9-b8753322360c" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.recruiting.get-JobRequistions-uri}">
+					<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : vars.client_secret,
+	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"client_id" : vars.client_id,
+	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
+	"userName" : p('cb-workday-sys-api.headers.userName')
+}]]]></http:headers>
+					<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"per_page" : p('cb-workday-sys-api.perPage')
+}]]]></http:query-params>
+				</http:request>
+				<logger level="INFO" doc:name="Logger" doc:id="4ec714f3-9057-4fbb-9539-e69a0fab2bf6" message="#[payload]" />
+				<flow-ref doc:name="Flow Reference" doc:id="96261270-71e9-47d1-b3e0-2b4be6ea45b6" name="get-attachmentFlow"/>
+			</when>
+			<otherwise>
+				<choice doc:name="Is Evergreen Requistions exists?" doc:id="eaf3df2b-ceb2-4bf0-b035-92c7f776f1e2" >
+					<when expression="vars.IsEvergreenRequistionsExists.Get_Evergreen_Requistions != null">
+						<http:request method="GET" doc:name="Get Evergreen Requistions Request" doc:id="d739063c-3a7d-49c0-989d-eabddb28b264" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.recruiting.get-EvergreenRequistions-uri}" >
+							<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : vars.client_secret,
+	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"client_id" : vars.client_id,
+	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
+	"userName" : p('cb-workday-sys-api.headers.userName')
+}]]]></http:headers>
+							<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"per_page" : p('cb-workday-sys-api.perPage')
+}]]]></http:query-params>
+						</http:request>
+						<logger level="INFO" doc:name="Logger" doc:id="12de5755-d933-40f7-92f2-89a81f6fb72d" message="#[payload]"/>
+						<flow-ref doc:name="Flow Reference" doc:id="9f9693fc-ed5b-44a3-a0d6-e6c014840426" name="get-attachmentFlow"/>
+					</when>
+					<otherwise >
+						<logger level="INFO" doc:name="Logger" doc:id="55683847-78d8-4597-89d4-c2a4c86409b9" message="#[payload]"/>
+					</otherwise>
+				</choice>
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Attach data if new" doc:id="6cb76572-057f-4cc7-9bbf-d3c1726a2963" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="ddd70b7c-3cdb-4c2b-927e-c3322e8e4945" name="put-candidatesFlow"/>
+	</flow>
 	<!-- <flow name="Create_Candidate" doc:id="222ef82c-ad7f-4e44-b0e1-dc85d263b4da" >
 		<choice doc:name="Choice" doc:id="da923a17-cf4c-4cdc-98ed-73510fd3bb35" >
 			<when expression="#[(vars.originalPayload.candidate.documents.requisition.requisitionId? and vars.originalPayload.candidate.documents.requisition.requisitionId == true)]" >

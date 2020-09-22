@@ -15,11 +15,14 @@ cb-workday-sys-api:
   headers:
     userName: "cb_integration_user"
     tenantName: "broadbean_dpt2"
+  perPage: "100"
   recruiting:
     create-applicant-uri: "/cb-workday-sys-api/v1/recruiting/candidates"
     get-candidates-uri: "/cb-workday-sys-api/v1/recruiting/candidates"
-  
-
+    get-JobRequistions-uri: "/cb-workday-sys-api/v1/recruiting/job_requisitions_id"
+    get-EvergreenRequistions-uri: "/cb-workday-sys-api/v1/recruiting/evergreen-requisitions"
+    
+    
 gunslinger-api:
   host: "wwwtest.api.careerbuilder.com"
   port: "443"
