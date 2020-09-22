@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	<http:request-config
+		name="HTTP_Request_configuration_workday"
+		doc:name="HTTP Request configuration"
+		doc:id="6659aace-e818-480b-b803-ec3a15521dd1"
+		responseTimeout="${http.requestTimeout}">
+		<http:request-connection host="${api.host}"
+			port="${api.port}" protocol="${http.protocol}" />
+	</http:request-config>
+	<import doc:name="Import"
+		doc:id="580275b9-e4eb-4410-afdf-2af93bf20b9a"
+		file="mule-exceptions.xml" />
+	<import doc:name="Import"
+		doc:id="4343a14a-ef6c-434d-9ab0-49aa7ef4ddf7" file="mule-logging.xml" />
+	<import doc:name="Import"
+		doc:id="55c628e3-e3ed-47ef-bc7a-cde15e00e178" file="gunslinger.xml" />
+	<configuration-properties
+		doc:name="Configuration properties"
+		doc:id="e819f71d-030f-4f0b-ae17-ae0b01b6928f"
+		file="config/config-cb-workday-proc-api-${mule.env}.yaml" />
+	<secure-properties:config
+		name="Secure_Properties_Config_workday"
+		doc:name="Secure Properties Config"
+		doc:id="6830f6f0-9d80-4651-b3ea-22ced6f5d1a7"
+		file="config/secure-config-cb-workday-proc-api-${mule.env}.yaml"
+		key="${mule.key}" />
+
+</mule>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="process-candidatesFlow" doc:id="bc6671cf-b823-490c-bdb3-b5f37265459e" >
+		<flow-ref doc:name="Get Candidates By Email" doc:id="ae034798-e74a-4ab5-94ac-3c05ef87fcce" name="get-candidatesFlow"/>
+		<choice doc:name="Choice" doc:id="20c93ce9-fa04-48b1-95ee-2c113780c804" >
+			<when expression="#[vars.originalPayload.isAppLink? and vars.originalPayload.isAppLink]">
+				<logger level="INFO" doc:name="Logger" doc:id="9570033d-fbf7-46e7-bbcb-e3b1b618a045" message="#[payload]"/>
+				<ee:transform doc:name="Transform Message" doc:id="498e0429-4758-463d-9499-cea232ff067e" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="hasCandidateEverApplied"><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="f0807767-a710-4ff9-802b-2cabc38114f0" message="#[payload]"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<sub-flow name="Check_Candidate_has_already_applied_forJob" doc:id="1276d95f-a985-45e2-b147-85c8243eef2d" />
+</mule>

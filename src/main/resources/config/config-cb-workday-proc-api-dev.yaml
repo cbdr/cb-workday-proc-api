@@ -1,0 +1,27 @@
+api:
+  id: "123"
+  name: "cb-workday-proc-api"
+  version: "v1"
+  host: "cb-integration-lb-dev-260781320.us-east-1.elb.amazonaws.com"
+  port: "80"
+http:
+  protocol: "HTTP"
+  requestTimeout: "60000"
+candidate-push:  
+  workday-candidate-recruiting-q: "cb.workday-candidate-recruiting-q"
+  
+  
+cb-workday-sys-api:
+  headers:
+    userName: "cb_integration_user"
+    tenantName: "broadbean_dpt2"
+  recruiting:
+    create-applicant-uri: "/cb-workday-sys-api/v1/recruiting/candidates"
+    get-candidates-uri: "/cb-workday-sys-api/v1/recruiting/candidates"
+  
+
+gunslinger-api:
+  host: "wwwtest.api.careerbuilder.com"
+  port: "443"
+  createTokenUri: "/oauth/token"
+  postgeoenricher: "/core/jobs/geoenricher"
