@@ -31,23 +31,23 @@ output application/java
 p('secure::client_secret')]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<flow-ref doc:name="Flow Reference to get access token" doc:id="f9fb5b9c-10cc-435c-9169-ec5910d4e264" name="gunslinger-api-get-token-config" target="accessToken" targetValue="#[payload.data.access_token]"/>
+		<!-- <flow-ref doc:name="Flow Reference to get access token" doc:id="f9fb5b9c-10cc-435c-9169-ec5910d4e264" name="gunslinger-api-get-token-config" target="accessToken" targetValue="#[payload.data.access_token]"/>
 		<http:request method="GET" doc:name="get Gunslinger configuration" doc:id="62e88c27-02b4-480d-823f-1bc14a2f72c1" config-ref="HTTP_Request_configuration_gunslinger" path="${gunslinger-api-config.getCustomMappingUri}" target="config">
 		<http:headers><![CDATA[#[output application/java
----
+-&#45;&#45;
 {
 	"Authorization" : "Bearer " ++ vars.accessToken
 }]]]></http:headers>
 						<http:query-params ><![CDATA[#[output application/java
-			---
+			-&#45;&#45;
 			{
 				"accountId" : vars.originalPayload.candidate.accountId,
 				"includeConfiguration" : "true",
 				"status" : "Active",
 				"environment" : p('gunslinger-api-config.environment')
 			}]]]></http:query-params>
-		</http:request>
-		<flow-ref doc:name="Flow Reference to process candidates" doc:id="459f6819-0891-481d-83db-a93545046476" name="process-candidatesFlow"/>
+		</http:request>-->
+		<flow-ref doc:name="Flow Reference to process candidates" doc:id="459f6819-0891-481d-83db-a93545046476" name="process-candidatesFlow"/> 
 	</flow>
 	<flow name="dequeueingFlow-test" doc:id="1096aa17-5014-44f0-8541-08a84d35fee8" >
 		<http:listener doc:name="Listener" doc:id="fb0e587d-a86e-400b-b025-ba860a4f636c" config-ref="cb-domain-httpListenerConfig" path="/cb-workday-proc-api/v1/recruiting-queue-test"/>

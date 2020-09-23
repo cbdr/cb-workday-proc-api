@@ -69,28 +69,57 @@ output application/java
 		</ee:transform>
 		<flow-ref doc:name="Flow Reference" doc:id="ddd70b7c-3cdb-4c2b-927e-c3322e8e4945" name="put-candidatesFlow"/>
 	</flow>
-	<!-- <flow name="Create_Candidate" doc:id="222ef82c-ad7f-4e44-b0e1-dc85d263b4da" >
-		<choice doc:name="Choice" doc:id="da923a17-cf4c-4cdc-98ed-73510fd3bb35" >
-			<when expression="#[(vars.originalPayload.candidate.documents.requisition.requisitionId? and vars.originalPayload.candidate.documents.requisition.requisitionId == true)]" >
-				<flow-ref doc:name="Flow Reference" doc:id="e89ec668-300c-4508-9df6-7a8d38323711" name="Get_Recruiting_Job_Requisition" />
-			</when>
-			<otherwise >
-				<choice doc:name="Choice" doc:id="6a8ae364-d4f5-4191-b7ba-ed54c8022c58" >
-					<when expression="#[(vars.originalPayload.candidate.Evergreen.requisition.requisitionId? and vars.originalPayload.candidate.Evergreen.requisition.requisitionId == true)]" >
-						<flow-ref doc:name="Flow Reference" doc:id="da2685fd-8fec-481c-b185-c86ec30f157a" name="Get_Recruiting_Evergreen_Requisition" />
-					</when>
-				</choice>
-			</otherwise>
-		</choice>
-		<ee:transform doc:name="Transform Message" doc:id="a4f5fa58-f321-485e-8f2b-dc3b955f84e5" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
+	<flow name="prepare-create-candidates" doc:id="f7f86912-e02d-4d21-82e2-18a5b3c854e6">
+		<ee:transform doc:name="Transform Message" doc:id="d2fb488e-9882-43ad-9a14-a18356ed87ae">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
 output application/java
--&#45;&#45;
+---
 {
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<flow-ref doc:name="Flow Reference" doc:id="033db5c4-05fc-40cd-a945-f2032f49ef40" name="Put_Applicant" />
-	</flow> -->
+	</flow>
+	<flow name="put-candidatesFlow" doc:id="f3489abf-1273-463b-bc92-eea3bdcbf045" >
+		<http:request method="GET" doc:name="Put Candidates Request " doc:id="421dbbd8-4cf8-45ec-9ae2-4a8786ed0663" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.recruiting.create-applicant-uri}" >
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : vars.client_secret,
+	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"client_id" : vars.client_id,
+	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
+	"userName" : p('cb-workday-sys-api.headers.userName')
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="2c821632-bca8-4466-a8b9-64be1d813631" message="#[payload]"/>
+	</flow>
+	<flow name="get-candidatesFlow" doc:id="207f5b99-fcd3-4e99-be49-0bfda9a7649b" >
+		<http:request method="GET" doc:name="Get Candidates Request By Email" doc:id="7e59f0c8-80fa-4b09-8db4-8722075121af" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.recruiting.get-candidates-uri}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : vars.client_secret,
+	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"client_id" : vars.client_id,
+	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
+	"userName" : p('cb-workday-sys-api.headers.userName')
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	("email" : vars.originalPayload.candidate.email[0]) if(vars.originalPayload.candidate.email[0]?)
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="66d1fd50-d593-4be3-96f0-ef841b5466cd" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="candidate" ><![CDATA[%dw 2.0
+output application/json
+---
+ if(payload.Get_Candidates_Response.Response_Data !=null ) payload.Get_Candidates_Response.Response_Data[0] else {}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</flow>
 </mule>

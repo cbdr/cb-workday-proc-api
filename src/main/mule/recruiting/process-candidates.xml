@@ -6,25 +6,32 @@
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="process-candidatesFlow" doc:id="bc6671cf-b823-490c-bdb3-b5f37265459e" >
 		<flow-ref doc:name="Get Candidates By Email" doc:id="ae034798-e74a-4ab5-94ac-3c05ef87fcce" name="get-candidatesFlow"/>
-		<choice doc:name="Choice" doc:id="20c93ce9-fa04-48b1-95ee-2c113780c804" >
-			<when expression="#[vars.originalPayload.isAppLink? and vars.originalPayload.isAppLink]">
-				<logger level="INFO" doc:name="Logger" doc:id="9570033d-fbf7-46e7-bbcb-e3b1b618a045" message="#[payload]"/>
-				<ee:transform doc:name="Transform Message" doc:id="498e0429-4758-463d-9499-cea232ff067e" >
-					<ee:message >
+		<choice doc:name="Choice" doc:id="20ddabbf-8ec3-4d77-8a4d-2aebfbfc0110" >
+			<when expression="#[vars.candidate !=null]">
+				<choice doc:name="Choice" doc:id="20c93ce9-fa04-48b1-95ee-2c113780c804">
+			<when expression="#[vars.originalPayload.candidate.documents.application? and vars.originalPayload.candidate.documents.requisition?]">
+				<logger level="INFO" doc:name="Logger" doc:id="9570033d-fbf7-46e7-bbcb-e3b1b618a045" message="#[payload]" />
+				<ee:transform doc:name="Transform Message" doc:id="498e0429-4758-463d-9499-cea232ff067e">
+					<ee:message>
 					</ee:message>
-					<ee:variables >
-						<ee:set-variable variableName="hasCandidateEverApplied"><![CDATA[%dw 2.0
-output application/java
+					<ee:variables>
+								<ee:set-variable variableName="candidateAlreadyAppliedToJob" ><![CDATA[%dw 2.0
+output application/json
+var requisitionId = vars.originalPayload.candidate.documents.requisition.requisitionId
+var getFilteredJobById= vars.candidate.Candidate_Data.*Job_Application_Data.Job_Applied_To_Data.Job_Requisition_Reference map ((item) -> item filterObject((value) ->  value == requisitionId))
 ---
-{
-}]]></ee:set-variable>
+if (getFilteredJobById !=null ) (getFilteredJobById reduce ((item, accumulator) -> item ++ accumulator)).ID else null
+]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
+						<flow-ref doc:name="Review Requisitions" doc:id="904e4fd4-00bf-49ad-8653-665f114b9e91" name="ReviewRequisitions"/>
 			</when>
-			<otherwise >
-				<logger level="INFO" doc:name="Logger" doc:id="f0807767-a710-4ff9-802b-2cabc38114f0" message="#[payload]"/>
+			<otherwise>
+				<logger level="INFO" doc:name="Logger" doc:id="f0807767-a710-4ff9-802b-2cabc38114f0" message="#[payload]" />
 			</otherwise>
 		</choice>
+			</when>
+		</choice>
 	</flow>
-	<sub-flow name="Check_Candidate_has_already_applied_forJob" doc:id="1276d95f-a985-45e2-b147-85c8243eef2d" />
+	<sub-flow name="ProcessCandidateteRequest" doc:id="1276d95f-a985-45e2-b147-85c8243eef2d" />
 </mule>

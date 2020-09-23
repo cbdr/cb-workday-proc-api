@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="Get_Job_Requisitions_ByJobId" doc:id="708e1c34-bcbe-4261-bc80-5ca9a5ec4d6e" >
+	<http:request method="GET" doc:name="Get Job Requisition Request By Job Id" doc:id="78c823be-5140-4541-bacf-22088a3411db" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.recruiting.get-JobRequistions-ByJobId-uri}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : vars.client_secret,
+	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"client_id" : vars.client_id,
+	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
+	"userName" : p('cb-workday-sys-api.headers.userName')
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"job_requisitions_id" : vars.originalPayload.candidate.documents.requisition.requisitionId
+}]]]></http:uri-params>
+			
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="53988617-36a4-4b88-867b-d410a30ce08e" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="jobRequisitionsDetails" ><![CDATA[%dw 2.0
+output application/json
+---
+payload.Get_Job_Requisitions_Response.Response_Data[0]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>	
+	</flow>
+	<flow name="Get_Evergreen_Requisitions_ByJobId" doc:id="a8d4cac9-dcec-4fa9-9668-a72d5bf88d2a" >
+	<http:request method="GET" doc:name="Get Evergreen Requisition Request By Job Id" doc:id="2beb4d00-b0ac-402d-bfe1-c50d5793e045" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.recruiting.get-EvergreenRequistions-ByJobId-uri}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : vars.client_secret,
+	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"client_id" : vars.client_id,
+	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
+	"userName" : p('cb-workday-sys-api.headers.userName')
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"evergreen_requisitions_id" : vars.originalPayload.candidate.documents.requisition.requisitionId
+}]]]></http:uri-params>
+			
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="c9eb324d-2d8b-45da-ad39-8145faa439e0" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="everGreenRequisitionsDetails" ><![CDATA[%dw 2.0
+output application/json
+---
+payload.Get_Evergreen_Requisitions_Response.Response_Data[0]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>	
+	</flow>
+	<flow name="ReviewRequisitions" doc:id="c5dfb3b6-aeaf-44c1-9419-5684942c1c02" >
+		<flow-ref doc:name="Get_Job_Requisitions_ByJobId" doc:id="1347f22a-0814-48ad-84b0-f92442ab955a" name="Get_Job_Requisitions_ByJobId"/>
+		<choice doc:name="Choice" doc:id="a4b2aa3a-1fe5-4c2c-90f0-cf6d4b253b0c" >
+			<when expression="#[vars.jobRequisitionsDetails !=nul]">
+				<flow-ref doc:name="Get_Evergreen_Requisitions_ByJobId" doc:id="a130c899-1283-4f56-bb97-b333f78051ab" name="Get_Evergreen_Requisitions_ByJobId"/>
+			</when>
+			<otherwise >
+				<logger level="DEBUG" doc:name="Logger" doc:id="ead7cbac-0ed3-41d7-bf85-448adc41973e" message="#[vars.jobRequisitionsDetails]"/>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

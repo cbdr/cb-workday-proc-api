@@ -19,8 +19,10 @@ cb-workday-sys-api:
   recruiting:
     create-applicant-uri: "/cb-workday-sys-api/v1/recruiting/candidates"
     get-candidates-uri: "/cb-workday-sys-api/v1/recruiting/candidates"
-    get-JobRequistions-uri: "/cb-workday-sys-api/v1/recruiting/job_requisitions_id"
+    get-JobRequistions-uri: "/cb-workday-sys-api/v1/recruiting/job-requisitions"
+    get-JobRequistions-ByJobId-uri: "/cb-workday-sys-api/v1/recruiting/job-requisitions/{job_requisitions_id}"
     get-EvergreenRequistions-uri: "/cb-workday-sys-api/v1/recruiting/evergreen-requisitions"
+    get-EvergreenRequistions-ByJobId-uri: "/cb-workday-sys-api/v1/recruiting/evergreen-requisitions/{evergreen_requisitions_id}"
     
     
 gunslinger-api:
