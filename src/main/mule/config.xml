@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule
+	xmlns:module-cb-event="http://www.mulesoft.org/schema/mule/module-cb-event"
 	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/module-cb-event http://www.mulesoft.org/schema/mule/module-cb-event/current/mule-module-cb-event.xsd">
 	<http:request-config
 		name="HTTP_Request_configuration_workday"
 		doc:name="HTTP Request configuration"
@@ -34,5 +35,6 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 		doc:id="6830f6f0-9d80-4651-b3ea-22ced6f5d1a7"
 		file="config/secure-config-cb-workday-proc-api-${mule.env}.yaml"
 		key="${mule.key}" />
+	<module-cb-event:config name="Cb_event_Connector_Config" doc:name="Cb-event Connector Config" doc:id="4fc57338-6755-4df4-b523-72f3a499a0c6" apiName="${api.name}" applicationVersion="${api.version}" clientId="#[p('secure::cb-log-sys-api.clientId')]" clientSecret="#[p('secure::cb-log-sys-api.clientSecret')]"/>
 
 </mule>

@@ -8,80 +8,103 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	<http:request-config name="HTTP_Request_configuration_workday1" doc:name="HTTP Request configuration" doc:id="e494efe4-752e-4a03-9333-44351774c106" responseTimeout="${http.requestTimeout}" >
 		<http:request-connection protocol="${http.protocol}" host="${api.host}" port="${api.port}" />
 	</http:request-config>
-	<flow name="Create-candidatesFlow" doc:id="86a30419-5461-413d-81b2-43af858f7a39" >
-		<choice doc:name="Is Job Requistions exists?" doc:id="ae285c55-873d-43a4-bd30-5e85f12a393c" >
-			<when expression="vars.IsJobRequistionsExists.Get_Job_Requistions != null" >
-				<http:request method="GET" doc:name="Get Job Requistions Request" doc:id="be2dff1a-04ef-4fd6-bbb9-b8753322360c" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.recruiting.get-JobRequistions-uri}">
-					<http:headers ><![CDATA[#[output application/java
----
-{
-	"client_secret" : vars.client_secret,
-	"password" : p('secure::cb-workday-sys-api.headers.password'),
-	"client_id" : vars.client_id,
-	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
-	"userName" : p('cb-workday-sys-api.headers.userName')
-}]]]></http:headers>
-					<http:query-params ><![CDATA[#[output application/java
----
-{
-	"per_page" : p('cb-workday-sys-api.perPage')
-}]]]></http:query-params>
-				</http:request>
-				<logger level="INFO" doc:name="Logger" doc:id="4ec714f3-9057-4fbb-9539-e69a0fab2bf6" message="#[payload]" />
-				<flow-ref doc:name="Flow Reference" doc:id="96261270-71e9-47d1-b3e0-2b4be6ea45b6" name="get-attachmentFlow"/>
-			</when>
-			<otherwise>
-				<choice doc:name="Is Evergreen Requistions exists?" doc:id="eaf3df2b-ceb2-4bf0-b035-92c7f776f1e2" >
-					<when expression="vars.IsEvergreenRequistionsExists.Get_Evergreen_Requistions != null">
-						<http:request method="GET" doc:name="Get Evergreen Requistions Request" doc:id="d739063c-3a7d-49c0-989d-eabddb28b264" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.recruiting.get-EvergreenRequistions-uri}" >
-							<http:headers ><![CDATA[#[output application/java
----
-{
-	"client_secret" : vars.client_secret,
-	"password" : p('secure::cb-workday-sys-api.headers.password'),
-	"client_id" : vars.client_id,
-	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
-	"userName" : p('cb-workday-sys-api.headers.userName')
-}]]]></http:headers>
-							<http:query-params ><![CDATA[#[output application/java
----
-{
-	"per_page" : p('cb-workday-sys-api.perPage')
-}]]]></http:query-params>
-						</http:request>
-						<logger level="INFO" doc:name="Logger" doc:id="12de5755-d933-40f7-92f2-89a81f6fb72d" message="#[payload]"/>
-						<flow-ref doc:name="Flow Reference" doc:id="9f9693fc-ed5b-44a3-a0d6-e6c014840426" name="get-attachmentFlow"/>
-					</when>
-					<otherwise >
-						<logger level="INFO" doc:name="Logger" doc:id="55683847-78d8-4597-89d4-c2a4c86409b9" message="#[payload]"/>
-					</otherwise>
-				</choice>
-			</otherwise>
-		</choice>
-		<ee:transform doc:name="Attach data if new" doc:id="6cb76572-057f-4cc7-9bbf-d3c1726a2963" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/java
----
-{
-}]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
-		<flow-ref doc:name="Flow Reference" doc:id="ddd70b7c-3cdb-4c2b-927e-c3322e8e4945" name="put-candidatesFlow"/>
-	</flow>
 	<flow name="prepare-create-candidates" doc:id="f7f86912-e02d-4d21-82e2-18a5b3c854e6">
 		<ee:transform doc:name="Transform Message" doc:id="d2fb488e-9882-43ad-9a14-a18356ed87ae">
 			<ee:message>
-				<ee:set-payload><![CDATA[%dw 2.0
-output application/java
----
-{
-}]]></ee:set-payload>
 			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="putCandidateRequest" ><![CDATA[%dw 2.0
+output application/json
+fun getNameData(candidateReq)={
+	Legal_Name: {
+		Name_Detail_Data: {
+			First_Name: candidateReq.firstName,
+			(Middle_Name: candidateReq.middleName) if(candidateReq.middleName?),
+			Last_Name: candidateReq.lastName,
+		}
+	}
+}
+fun getContactData(candidateReq)={
+	Phone_Number: candidateReq.phoneNumbers[0].phoneNumber,
+	Email_Address: candidateReq.email[0],
+	Location_Data: {
+		(Address_Line_1: candidateReq.geography.address) if(candidateReq.geography.address?),
+		(City: candidateReq.geography.locality) if(candidateReq.geography.locality?),
+		(Postal_Code: candidateReq.geography.postalCode) if(candidateReq.geography.postalCode?),
+		(Country: candidateReq.geography.country) if(candidateReq.geography.country?)
+	}
+}
+fun getJobAppliedToData(candidateReq)={
+	Job_Requisition_Reference: {
+		ID: candidateReq.documents.requisition.requisitionId
+	}
+}
+fun getResumeAttachmentData(candidateReq)={
+	Filename: candidateReq.documents.resume.fileName,
+	File_Content: candidateReq.documents.resume.document
+}
+fun getResumeData(candidateReq)={
+	(Summary: candidateReq.documents.resume.text) if(candidateReq.documents.resume.text?),
+	File_Content: candidateReq.documents.resume.document,
+	(Experience_Data: getExperienceData(candidateReq)) if (candidateReq.documents.workHistory.histories !=null)
+}
+fun getExperienceData(candidateReq)=
+	 candidateReq.documents.workHistory.histories map ((item) ->
+  {
+      Company_Name: item.company,
+      Title: item.jobTitle,
+      Start_Month: item.startDate as DateTime as String {format: "MM"},
+      Start_Year: item.startDate as DateTime as String {format: "yyyy"},
+      End_Month: item.endDate as DateTime as String {format: "MM"},
+      End_Year: item.endDate as DateTime as String {format: "yyyy"}
+  }
+ )
+
+---
+if(vars.candidate !=null and !isEmpty(vars.candidate) and vars.jobRequisitionsDetails !=null and !isEmpty(vars.jobRequisitionsDetails)) {
+	Candidate: {
+		Candidate_Reference: {
+			ID: vars.candidate.Candidate_Reference.ID
+		},
+		Candidate_Data: {
+			Name_Data: getNameData((vars.originalPayload.candidate)),
+			Contact_Data: getContactData(vars.originalPayload.candidate),
+			Job_Application_Data: {
+				Job_Applied_To_Data: getJobAppliedToData(vars.originalPayload.candidate),
+				Resume_Attachment_Data: getResumeAttachmentData(vars.originalPayload.candidate),
+				Resume_Data: getResumeData(vars.originalPayload.candidate)
+			}
+		}
+	}
+}
+else if((isEmpty(vars.candidate)  and vars.jobRequisitionsDetails !=null and !isEmpty(vars.jobRequisitionsDetails))) {
+	Candidate: {
+		Candidate_Data: {
+			Name_Data: getNameData((vars.originalPayload.candidate)),
+			Contact_Data: getContactData(vars.originalPayload.candidate),
+			Job_Application_Data: {
+				Job_Applied_To_Data: getJobAppliedToData(vars.originalPayload.candidate),
+				Resume_Attachment_Data: getResumeAttachmentData(vars.originalPayload.candidate),
+				Resume_Data: getResumeData(vars.originalPayload.candidate)
+			}
+		}
+	}
+}
+else {
+	Candidate: {
+		Candidate_Data: {
+			Name_Data: getNameData(vars.originalPayload.candidate),
+			Contact_Data: getContactData(vars.originalPayload.candidate)			
+		}
+	}
+}]]></ee:set-variable>
+			</ee:variables>
 		</ee:transform>
+		<flow-ref doc:name="Put Candidate" doc:id="00b9c8ef-6236-4cc6-b49c-8ecbda96f05a" name="put-candidatesFlow"/>
 	</flow>
 	<flow name="put-candidatesFlow" doc:id="f3489abf-1273-463b-bc92-eea3bdcbf045" >
-		<http:request method="GET" doc:name="Put Candidates Request " doc:id="421dbbd8-4cf8-45ec-9ae2-4a8786ed0663" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.recruiting.create-applicant-uri}" >
+		<http:request method="POST" doc:name="Put Candidates Request " doc:id="421dbbd8-4cf8-45ec-9ae2-4a8786ed0663" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.recruiting.create-candidates-uri}" >
+			<http:body ><![CDATA[#[vars.putCandidateRequest]]]></http:body>
 			<http:headers ><![CDATA[#[output application/java
 ---
 {

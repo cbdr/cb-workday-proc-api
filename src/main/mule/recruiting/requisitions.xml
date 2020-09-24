@@ -56,7 +56,7 @@ payload.Get_Job_Requisitions_Response.Response_Data[0]]]></ee:set-variable>
 			<ee:message >
 			</ee:message>
 			<ee:variables >
-				<ee:set-variable variableName="everGreenRequisitionsDetails" ><![CDATA[%dw 2.0
+				<ee:set-variable variableName="jobRequisitionsDetails" ><![CDATA[%dw 2.0
 output application/json
 ---
 payload.Get_Evergreen_Requisitions_Response.Response_Data[0]]]></ee:set-variable>
@@ -66,7 +66,7 @@ payload.Get_Evergreen_Requisitions_Response.Response_Data[0]]]></ee:set-variable
 	<flow name="ReviewRequisitions" doc:id="c5dfb3b6-aeaf-44c1-9419-5684942c1c02" >
 		<flow-ref doc:name="Get_Job_Requisitions_ByJobId" doc:id="1347f22a-0814-48ad-84b0-f92442ab955a" name="Get_Job_Requisitions_ByJobId"/>
 		<choice doc:name="Choice" doc:id="a4b2aa3a-1fe5-4c2c-90f0-cf6d4b253b0c" >
-			<when expression="#[vars.jobRequisitionsDetails !=nul]">
+			<when expression="#[vars.jobRequisitionsDetails == null]">
 				<flow-ref doc:name="Get_Evergreen_Requisitions_ByJobId" doc:id="a130c899-1283-4f56-bb97-b333f78051ab" name="Get_Evergreen_Requisitions_ByJobId"/>
 			</when>
 			<otherwise >

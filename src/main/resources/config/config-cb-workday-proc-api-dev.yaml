@@ -17,7 +17,7 @@ cb-workday-sys-api:
     tenantName: "broadbean_dpt2"
   perPage: "100"
   recruiting:
-    create-applicant-uri: "/cb-workday-sys-api/v1/recruiting/candidates"
+    create-candidates-uri: "/cb-workday-sys-api/v1/recruiting/candidates"
     get-candidates-uri: "/cb-workday-sys-api/v1/recruiting/candidates"
     get-JobRequistions-uri: "/cb-workday-sys-api/v1/recruiting/job-requisitions"
     get-JobRequistions-ByJobId-uri: "/cb-workday-sys-api/v1/recruiting/job-requisitions/{job_requisitions_id}"
