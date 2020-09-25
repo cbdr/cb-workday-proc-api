@@ -31,6 +31,7 @@ fun getContactData(candidateReq)={
 		(Address_Line_1: candidateReq.geography.address) if(candidateReq.geography.address?),
 		(City: candidateReq.geography.locality) if(candidateReq.geography.locality?),
 		(Postal_Code: candidateReq.geography.postalCode) if(candidateReq.geography.postalCode?),
+		(State: candidateReq.geography.adminArea) if(candidateReq.geography.adminArea?),
 		(Country: candidateReq.geography.country) if(candidateReq.geography.country?)
 	}
 }
@@ -46,7 +47,8 @@ fun getResumeAttachmentData(candidateReq)={
 fun getResumeData(candidateReq)={
 	(Summary: candidateReq.documents.resume.text) if(candidateReq.documents.resume.text?),
 	File_Content: candidateReq.documents.resume.document,
-	(Experience_Data: getExperienceData(candidateReq)) if (candidateReq.documents.workHistory.histories !=null)
+	(Experience_Data: getExperienceData(candidateReq)) if (candidateReq.documents.workHistory.histories !=null),
+	(Education_Data: getEducationData(candidateReq)) if (candidateReq.documents.educationHistory !=null)
 }
 fun getExperienceData(candidateReq)=
 	 candidateReq.documents.workHistory.histories map ((item) ->
@@ -60,6 +62,12 @@ fun getExperienceData(candidateReq)=
   }
  )
 
+fun getEducationData(candidateReq)=
+	 candidateReq.documents.educationHistory map ((item) ->
+  {
+      School_Name: item.school      
+  }
+ )
 ---
 if(vars.candidate !=null and !isEmpty(vars.candidate) and vars.jobRequisitionsDetails !=null and !isEmpty(vars.jobRequisitionsDetails)) {
 	Candidate: {
