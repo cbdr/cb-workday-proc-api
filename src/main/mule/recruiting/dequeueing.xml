@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
-	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:module-cb-event="http://www.mulesoft.org/schema/mule/module-cb-event" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/module-cb-event http://www.mulesoft.org/schema/mule/module-cb-event/current/mule-module-cb-event.xsd">
 	<flow name="queueingFlow" doc:id="f8261f7c-4249-4d87-9c11-888913087569" >
 		<jms:listener doc:name="Listener" doc:id="8f35a995-75b6-4b5a-8a94-4d30a24cfb82" config-ref="JMS_Config_1_1" destination="${candidate-push.workday-candidate-recruiting-q}" ackMode="AUTO">
 			<jms:consumer-type >
@@ -47,7 +48,19 @@ p('secure::client_secret')]]></ee:set-variable>
 				"environment" : p('gunslinger-api-config.environment')
 			}]]]></http:query-params>
 		</http:request>-->
-		<flow-ref doc:name="Flow Reference to process candidates" doc:id="459f6819-0891-481d-83db-a93545046476" name="process-candidatesFlow"/> 
+		<module-cb-event:send-scalyr-event eventType="requests" doc:name="Send scalyr event" doc:id="08189917-b1f6-45c2-ac28-5447758e00a0" config-ref="Cb_event_Connector_Config" eventStatus="Success" eventMsg="Candidate received" transactionProperties='#[attributes.correlationId]' flowName="queueingFlow">
+			<module-cb-event:payload ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	requestName: "Candidate received",
+	entryLevel: "Candidate dequeued",
+	requestContent: write(payload,"application/json") as String replace /[\t\r\n\f]+/ with "" as String
+	
+}]]]></module-cb-event:payload>
+		</module-cb-event:send-scalyr-event>
+		<flow-ref doc:name="Flow Reference to process candidates" doc:id="459f6819-0891-481d-83db-a93545046476" name="process-candidatesFlow"/>
+		<error-handler ref="messaging_error_handler"/>
 	</flow>
 	<flow name="dequeueingFlow-test" doc:id="1096aa17-5014-44f0-8541-08a84d35fee8" >
 		<http:listener doc:name="Listener" doc:id="fb0e587d-a86e-400b-b025-ba860a4f636c" config-ref="cb-domain-httpListenerConfig" path="/cb-workday-proc-api/v1/recruiting-queue-test"/>

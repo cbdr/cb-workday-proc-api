@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:module-cb-event="http://www.mulesoft.org/schema/mule/module-cb-event" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/module-cb-event http://www.mulesoft.org/schema/mule/module-cb-event/current/mule-module-cb-event.xsd">
 	<http:request-config name="HTTP_Request_configuration_workday1" doc:name="HTTP Request configuration" doc:id="e494efe4-752e-4a03-9333-44351774c106" responseTimeout="${http.requestTimeout}" >
 		<http:request-connection protocol="${http.protocol}" host="${api.host}" port="${api.port}" />
 	</http:request-config>
@@ -100,7 +101,21 @@ else {
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
+		<module-cb-event:send-scalyr-event doc:name="Send scalyr event" doc:id="971f536e-7c50-411f-af1e-ae60827d654e" config-ref="Cb_event_Connector_Config" eventType="requests" eventStatus="Success" eventMsg=" Candidate process request" flowName="prepare-create-candidates" transactionProperties="#[attributes.correlationId]">
+			<module-cb-event:payload ><![CDATA[#[%dw 2.0
+output application/java
+---
+
+requestContent: write(payload,"application/json") as String replace /[\t\r\n\f]+/ with "" as String]]]></module-cb-event:payload>
+		</module-cb-event:send-scalyr-event>
 		<flow-ref doc:name="Put Candidate" doc:id="00b9c8ef-6236-4cc6-b49c-8ecbda96f05a" name="put-candidatesFlow"/>
+		<module-cb-event:send-scalyr-event doc:name="Send scalyr event" doc:id="83f16972-91b8-4141-a3ab-da0498b2eb83" config-ref="Cb_event_Connector_Config" eventType="responses" eventStatus="Success" eventMsg="Candidate creation response" flowName="Candidate process request" transactionProperties="#[attributes.correlationId]">
+			<module-cb-event:payload ><![CDATA[#[%dw 2.0
+output application/java
+---
+
+requestContent: write(payload,"application/json") as String replace /[\t\r\n\f]+/ with "" as String]]]></module-cb-event:payload>
+		</module-cb-event:send-scalyr-event>
 	</flow>
 	<flow name="put-candidatesFlow" doc:id="f3489abf-1273-463b-bc92-eea3bdcbf045" >
 		<logger level="DEBUG" doc:name="Logger" doc:id="fc9ffb0a-5835-4d4e-872d-085ece4b98c6" message="Put Candidate Request : #[vars.putCandidateRequest]"/>

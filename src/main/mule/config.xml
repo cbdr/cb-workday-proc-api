@@ -36,5 +36,5 @@ http://www.mulesoft.org/schema/mule/module-cb-event http://www.mulesoft.org/sche
 		file="config/secure-config-cb-workday-proc-api-${mule.env}.yaml"
 		key="${mule.key}" />
 	<module-cb-event:config name="Cb_event_Connector_Config" doc:name="Cb-event Connector Config" doc:id="4fc57338-6755-4df4-b523-72f3a499a0c6" apiName="${api.name}" applicationVersion="${api.version}" clientId="#[p('secure::cb-log-sys-api.clientId')]" clientSecret="#[p('secure::cb-log-sys-api.clientSecret')]"/>
-
+	<import doc:name="Import" doc:id="7f79f83f-7052-46f1-8e39-dbdc3f507348" file="cb-mule-event-library.xml" />
 </mule>
