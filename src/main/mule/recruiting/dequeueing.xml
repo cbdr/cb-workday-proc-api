@@ -51,12 +51,26 @@ p('secure::client_secret')]]></ee:set-variable>
 		<module-cb-event:send-scalyr-event eventType="requests" doc:name="Send scalyr event" doc:id="08189917-b1f6-45c2-ac28-5447758e00a0" config-ref="Cb_event_Connector_Config" eventStatus="Success" eventMsg="Candidate received" transactionProperties='#[attributes.correlationId]' flowName="queueingFlow">
 			<module-cb-event:payload ><![CDATA[#[%dw 2.0
 output application/java
+var addCandidate = candidate: payload.candidate mapObject (value, key) ->
+	{
+    		(if (key ~= "documents") documents: payload.candidate.documents mapObject (value1, key1) ->
+    			{ (if (key1 ~= "resume") (key1): "******"  else (key1): value1)}
+    			else (key): value
+    		)
+ 	}
+var addConfig = { configuration: payload.configuration mapObject (value, key) ->
+	{
+    		(if (key ~= "atsConfig") atsConfig: payload.configuration.atsConfig mapObject (value1, key1) ->
+    			{(if (key1 ~= "workday") (key1): "******"  else (key1): value1)}
+    			else (key): value
+    		)
+ 	}
+ 	}
+var actualPayload = addCandidate ++ addConfig
 ---
 {
-	requestName: "Candidate received",
-	entryLevel: "Candidate dequeued",
-	requestContent: write(payload,"application/json") as String replace /[\t\r\n\f]+/ with "" as String
-	
+	requestName: "Candidate dequeued",
+	requestContent: write(actualPayload,"application/json") as String replace /[\t\r\n\f]+/ with "" as String
 }]]]></module-cb-event:payload>
 		</module-cb-event:send-scalyr-event>
 		<flow-ref doc:name="Flow Reference to process candidates" doc:id="459f6819-0891-481d-83db-a93545046476" name="process-candidatesFlow"/>
