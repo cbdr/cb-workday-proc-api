@@ -28,11 +28,12 @@ if (getFilteredJobById !=null ) (getFilteredJobById reduce ((item, accumulator) 
 						<choice doc:name="Check If the candidate has already applied for this job" doc:id="207392ec-5e0d-420f-b9e2-bbef1f450009">
 							<when expression="#[vars.candidateAlreadyAppliedToJob !=null]">
 								<module-cb-event:send-scalyr-event doc:name="Send scalyr event" doc:id="28f0fe4e-324f-4da7-b274-3fcae2e1a801" config-ref="Cb_event_Connector_Config" eventType="logentries" eventStatus="Success" eventMsg="Candidate has already applied to this Job" flowName="process-candidatesFlow" transactionProperties="#[{requisitionId: vars.originialPayload.candidate.documents.requisitions.requisitionId}]">
-									<module-cb-event:payload ><![CDATA[#[vars.originialPayload.candidate - "documents"]]]></module-cb-event:payload>
+									<module-cb-event:payload ><![CDATA[#[vars.originalPayload.candidate - "documents"]]]></module-cb-event:payload>
 								</module-cb-event:send-scalyr-event>
 							</when>
 							<otherwise >
 								<flow-ref doc:name="Review Requisitions" doc:id="904e4fd4-00bf-49ad-8653-665f114b9e91" name="ReviewRequisitions" />
+								<flow-ref doc:name="Flow Reference" doc:id="c2fd75c6-4d1a-440a-abb8-4fad7aecc95e" name="getDegreesAndFieldOfStudyReferences"/>
 								<flow-ref doc:name="CreateCandidate" doc:id="01e11531-f3cd-4c4f-8d6d-24e17361c890" name="prepare-create-candidates" />
 							</otherwise>
 						</choice>
@@ -41,6 +42,7 @@ if (getFilteredJobById !=null ) (getFilteredJobById reduce ((item, accumulator) 
 				<logger level="INFO" doc:name="Logger" doc:id="f0807767-a710-4ff9-802b-2cabc38114f0" message="#[payload]" />
 						
 						<flow-ref doc:name="ValidateRequisition" doc:id="43af006e-2c3b-432e-8ec3-6620e0f98fa0" name="ReviewRequisitions" />
+						<flow-ref doc:name="Flow Reference" doc:id="4fd94623-69aa-4c3b-9055-9d49e4584d2b" name="getDegreesAndFieldOfStudyReferences"/>
 						<flow-ref doc:name="CreateCandidate" doc:id="8bd84c13-d489-4491-81c2-d854360a6344" name="prepare-create-candidates" />
 			</otherwise>
 		</choice>

@@ -15,7 +15,7 @@ cb-workday-sys-api:
   headers:
     userName: "cb_integration_user"
     tenantName: "broadbean_dpt2"
-  perPage: "100"
+  pageSize: "999"
   recruiting:
     create-candidates-uri: "/cb-workday-sys-api/v1/recruiting/candidates"
     get-candidates-uri: "/cb-workday-sys-api/v1/recruiting/candidates"
@@ -23,8 +23,9 @@ cb-workday-sys-api:
     get-JobRequistions-ByJobId-uri: "/cb-workday-sys-api/v1/recruiting/job-requisitions/{job_requisitions_id}"
     get-EvergreenRequistions-uri: "/cb-workday-sys-api/v1/recruiting/evergreen-requisitions"
     get-EvergreenRequistions-ByJobId-uri: "/cb-workday-sys-api/v1/recruiting/evergreen-requisitions/{evergreen_requisitions_id}"
-    
-    
+  talent:
+    get-degrees-uri: "/cb-workday-sys-api/v1/talent/degrees"
+    get-field-of-studies-uri: "/cb-workday-sys-api/v1/talent/field-of-studies"
 gunslinger-api:
   host: "wwwtest.api.careerbuilder.com"
   port: "443"
