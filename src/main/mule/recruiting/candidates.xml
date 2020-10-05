@@ -36,7 +36,10 @@ fun getJobAppliedToData(candidateReq)={
 	Job_Requisition_Reference: {
 		ID: candidateReq.documents.requisition.requisitionId
 	},
-	Job_Application_Date: candidateReq.documents.application.date
+	Job_Application_Date: candidateReq.documents.application.date,
+	Source_Reference: {
+		ID: candidateReq.source
+	},
 }
 fun getResumeAttachmentData(candidateReq)={
 	Filename: candidateReq.documents.resume.fileName,
@@ -72,8 +75,16 @@ fun getEducationData(req)=
       }) if(item.field?)     
   }
  )
-
-
+fun getSkillsData(candidateReq)=
+	 candidateReq.documents.skills map ((item) ->  
+      Skill_Name: item.company 
+ )
+fun getQuestionnaireData(req)=
+	(Response_Data:{
+		Questionnaire_Reference: req.Questionnaire_Reference,
+		Questionnaire_Answer_Data: req
+  }
+ )
 ---
 if(vars.candidate !=null and !isEmpty(vars.candidate) and vars.jobRequisitionsDetails !=null and !isEmpty(vars.jobRequisitionsDetails)) {
 	Candidate: {
