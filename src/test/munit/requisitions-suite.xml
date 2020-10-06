@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="requisitions-suite.xml" />
+	<munit:test name="ReviewRequisitions-test" doc:id="ebffde7e-129e-4011-83bd-f3cc26e070c9" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Get_Job_Requisitions_ByJobId" doc:id="7aa68bae-d366-47a0-99d3-5280c7d61c29" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="1347f22a-0814-48ad-84b0-f92442ab955a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/xml --- readUrl('classpath://ReviewRequisitionstest/mock_payload.dwl')]" mediaType="application/xml" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://ReviewRequisitionstest/mock_attributes.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="jobRequisitionsDetails" value="#[output application/json --- readUrl('classpath://ReviewRequisitionstest/mock_variable_.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="candidate" value="#[output application/json --- readUrl('classpath://ReviewRequisitionstest/mock_variable_1.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="originalPayload" value="#[output application/json --- readUrl('classpath://ReviewRequisitionstest/mock_variable_2.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="client_secret" value="#[output application/java --- readUrl('classpath://ReviewRequisitionstest/mock_variable_3.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="client_id" value="#[output application/java --- readUrl('classpath://ReviewRequisitionstest/mock_variable_4.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="f85401b4-e32c-4026-98f9-228fd81a98ff" >
+				<munit:payload value="#[output application/xml --- readUrl('classpath://ReviewRequisitionstest/set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/xml" />
+				<munit:attributes value="#[readUrl('classpath://ReviewRequisitionstest/set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="candidate" value="#[output application/json --- readUrl('classpath://ReviewRequisitionstest/set-event_variable_.dwl')]" encoding="UTF-8" mediaType="application/json" />
+					<munit:variable key="originalPayload" value="#[output application/json --- readUrl('classpath://ReviewRequisitionstest/set-event_variable_1.dwl')]" encoding="UTF-8" mediaType="application/json" />
+					<munit:variable key="client_secret" value="#[output application/java --- readUrl('classpath://ReviewRequisitionstest/set-event_variable_2.dwl')]" encoding="UTF-8" mediaType="application/java" />
+					<munit:variable key="client_id" value="#[output application/java --- readUrl('classpath://ReviewRequisitionstest/set-event_variable_3.dwl')]" encoding="UTF-8" mediaType="application/java" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to ReviewRequisitions" doc:id="394b563b-9886-4a5d-afad-5aa01f0ac5f8" name="ReviewRequisitions"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="b32d851f-f726-40c0-956a-57ae2a9548ce" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import ReviewRequisitionstest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="Get_Job_Requisitions_ByJobId-test" doc:id="34975373-b335-4a7f-b471-934985112b5e" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Get Job Requisition Request By Job Id" doc:id="731aa7b2-4007-4370-a548-b02f4d39afce" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="78c823be-5140-4541-bacf-22088a3411db" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/xml --- readUrl('classpath://GetJobRequisitionsByJobIdtest/mock_payload.dwl')]" mediaType="application/xml" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://GetJobRequisitionsByJobIdtest/mock_attributes.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="candidate" value="#[output application/json --- readUrl('classpath://GetJobRequisitionsByJobIdtest/mock_variable_.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="originalPayload" value="#[output application/json --- readUrl('classpath://GetJobRequisitionsByJobIdtest/mock_variable_1.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="client_secret" value="#[output application/java --- readUrl('classpath://GetJobRequisitionsByJobIdtest/mock_variable_2.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="client_id" value="#[output application/java --- readUrl('classpath://GetJobRequisitionsByJobIdtest/mock_variable_3.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="d1a8b1df-7ea7-48c9-a9cd-09382e748f71" >
+				<munit:payload value="#[output application/xml --- readUrl('classpath://GetJobRequisitionsByJobIdtest/set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/xml" />
+				<munit:attributes value="#[readUrl('classpath://GetJobRequisitionsByJobIdtest/set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="candidate" value="#[output application/json --- readUrl('classpath://GetJobRequisitionsByJobIdtest/set-event_variable_.dwl')]" encoding="UTF-8" mediaType="application/json" />
+					<munit:variable key="originalPayload" value="#[output application/json --- readUrl('classpath://GetJobRequisitionsByJobIdtest/set-event_variable_1.dwl')]" encoding="UTF-8" mediaType="application/json" />
+					<munit:variable key="client_secret" value="#[output application/java --- readUrl('classpath://GetJobRequisitionsByJobIdtest/set-event_variable_2.dwl')]" encoding="UTF-8" mediaType="application/java" />
+					<munit:variable key="client_id" value="#[output application/java --- readUrl('classpath://GetJobRequisitionsByJobIdtest/set-event_variable_3.dwl')]" encoding="UTF-8" mediaType="application/java" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to Get_Job_Requisitions_ByJobId" doc:id="616f3e5a-7329-4f73-b495-ce0ceefc0c4a" name="Get_Job_Requisitions_ByJobId"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="3aa332b8-5faa-4db0-bea5-5dd92a4a1483" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import GetJobRequisitionsByJobIdtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			<munit-tools:verify-call doc:name="Verify Transform Message" doc:id="7f1b1cee-ef39-4d28-afdc-9c7ee8dca424" processor="ee:transform" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="53988617-36a4-4b88-867b-d410a30ce08e" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+
+</mule>
