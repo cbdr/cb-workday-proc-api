@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="dequeueing-suite.xml" />
+	<munit:test name="queueingFlow-test" doc:id="2047808d-3f6d-451d-b506-e77e999d9df7" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Flow Reference to process candidates" doc:id="6f8e45dc-5031-43d7-aef9-cfc35f0fe0c6" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="459f6819-0891-481d-83db-a93545046476" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/xml --- readUrl('classpath://queueingFlowtest/mock_payload.dwl')]" mediaType="application/xml" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://queueingFlowtest/mock_attributes.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="jobRequisitionsDetails" value="#[output application/json --- readUrl('classpath://queueingFlowtest/mock_variable_.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="candidate" value="#[output application/json --- readUrl('classpath://queueingFlowtest/mock_variable_1.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="originalPayload" value="#[output application/json --- readUrl('classpath://queueingFlowtest/mock_variable_2.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="putCandidateRequest" value="#[output application/json skipnullon=&quot;everywhere&quot; --- readUrl('classpath://queueingFlowtest/mock_variable_3.dwl')]" mediaType='application/json skipnullon="everywhere"' encoding="UTF-8" />
+						<munit-tools:variable key="degreeResponse" value="#[output application/json --- readUrl('classpath://queueingFlowtest/mock_variable_4.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="client_secret" value="#[output application/java --- readUrl('classpath://queueingFlowtest/mock_variable_5.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="degreeData" value="#[output application/xml --- readUrl('classpath://queueingFlowtest/mock_variable_6.dwl')]" mediaType="application/xml" encoding="UTF-8" />
+						<munit-tools:variable key="client_id" value="#[output application/java --- readUrl('classpath://queueingFlowtest/mock_variable_7.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="da80773b-91b5-4ad6-8f73-6b2db06e09bd" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://queueingFlowtest/set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[output application/java --- readUrl('classpath://queueingFlowtest/set-event_attributes.dwl')]" mediaType="application/java" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to queueingFlow" doc:id="fe43ddf1-2d6a-4689-b7df-b3444a5881e2" name="queueingFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="bcb6804a-7db7-4aa9-88f8-6bda9803e833" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import queueingFlowtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			<munit-tools:verify-call doc:name="Verify Logger" doc:id="fb397c93-7f8c-488a-bdf6-52e8fd8689ff" processor="logger" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="24e52500-d87a-4f8c-a136-a76bd4f56df1" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+
+</mule>
