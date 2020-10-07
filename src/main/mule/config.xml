@@ -25,6 +25,7 @@ http://www.mulesoft.org/schema/mule/module-cb-event http://www.mulesoft.org/sche
 		doc:id="4343a14a-ef6c-434d-9ab0-49aa7ef4ddf7" file="mule-logging.xml" />
 	<import doc:name="Import"
 		doc:id="55c628e3-e3ed-47ef-bc7a-cde15e00e178" file="gunslinger.xml" />
+		<import doc:name="Import" doc:id="2926ce26-b58b-47ba-82d8-d2393961cf41" file="cb-mule-event-library.xml" />
 	<configuration-properties
 		doc:name="Configuration properties"
 		doc:id="e819f71d-030f-4f0b-ae17-ae0b01b6928f"

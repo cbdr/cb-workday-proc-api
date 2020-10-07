@@ -22,8 +22,8 @@ fun getNameData(candidateReq)={
 	}
 }
 fun getContactData(candidateReq)={
-	Phone_Number: candidateReq.phoneNumbers[0].phoneNumber replace  /\s/ with "",
-	Email_Address: candidateReq.email[0],
+	(Phone_Number: candidateReq.phoneNumbers[0].phoneNumber replace  /\s/ with "") if(candidateReq.phoneNumbers[0]?),
+	(Email_Address: candidateReq.email[0]) if(candidateReq.email[0]?),
 	Location_Data: {
 		(Address_Line_1: candidateReq.geography.address) if(candidateReq.geography.address?),
 		(City: candidateReq.geography.locality) if(candidateReq.geography.locality?),

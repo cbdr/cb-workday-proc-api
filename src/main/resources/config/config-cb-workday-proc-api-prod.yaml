@@ -2,13 +2,13 @@ api:
   id: "123"
   name: "cb-workday-proc-api"
   version: "v1"
-  host: "cb-integration-lb-dev-260781320.us-east-1.elb.amazonaws.com"
-  port: "80"
+  host: "eai.careerbuilder.com"
+  port: "443"
 http:
-  protocol: "HTTP"
+  protocol: "HTTPS"
   requestTimeout: "60000"
 candidate-push:  
-  workday-candidate-recruiting-q: "cb.workday-candidate-recruiting-q-test1"
+  workday-candidate-recruiting-q: "cb.workday-candidate-recruiting-q"
   
   
 cb-workday-sys-api:
@@ -27,7 +27,7 @@ cb-workday-sys-api:
     get-degrees-uri: "/cb-workday-sys-api/v1/talent/degrees"
     get-field-of-studies-uri: "/cb-workday-sys-api/v1/talent/field-of-studies"
 gunslinger-api:
-  host: "wwwtest.api.careerbuilder.com"
+  host: "api.careerbuilder.com"
   port: "443"
   createTokenUri: "/oauth/token"
   postgeoenricher: "/core/jobs/geoenricher"
