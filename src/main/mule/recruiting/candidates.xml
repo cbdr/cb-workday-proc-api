@@ -66,15 +66,15 @@ fun getExperienceData(candidateReq)=
 fun getEducationData(req)=
 	req map ((item) ->
   {
-      School_Name: item.school,
+      (School_Name: item.school) if(item.school?),
       (Degree_Reference: {
       	ID: item.degree
-      }) if(item.degree?),
+      }) if(item.degree? and item.school?),
       (Field_of_Study_Reference:{
       	ID:item.field
-      }) if(item.field?)     
+      }) if(item.field? and item.school?)     
   }
- )
+ ) filter ($ != {})
 fun getSkillsData(candidateReq)=
 	 candidateReq.documents.skills map ((item) ->  
       Skill_Name: item.company 
