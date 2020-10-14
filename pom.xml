@@ -89,5 +89,15 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
+    <distributionManagement>
+    <snapshotRepository>
+      <id>nexus-mule</id>
+      <url>http://ec2-3-220-35-123.compute-1.amazonaws.com:9001/repository/maven-snapshots/</url>
+    </snapshotRepository>
+    <repository>
+      <id>nexus-mule</id>
+      <url>http://ec2-3-220-35-123.compute-1.amazonaws.com:9001/repository/maven-releases/</url>
+    </repository>
+  </distributionManagement>
 
 </project>
