@@ -8,7 +8,7 @@ http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/module-cb-event http://www.mulesoft.org/schema/mule/module-cb-event/current/mule-module-cb-event.xsd">
 	<flow name="queueingFlow" doc:id="f8261f7c-4249-4d87-9c11-888913087569" >
-		<jms:listener doc:name="Listener" doc:id="8f35a995-75b6-4b5a-8a94-4d30a24cfb82" config-ref="JMS_Config_1_1" destination="${candidate-push.workday-candidate-recruiting-q}" ackMode="AUTO">
+		<jms:listener doc:name="Listener" doc:id="8f35a995-75b6-4b5a-8a94-4d30a24cfb82" config-ref="JMS_Config_1_1" destination="${candidate-push.workday-candidate-recruiting-q}" ackMode="AUTO" numberOfConsumers="${jms-active-mq.consumer.number}">
 			<jms:consumer-type >
 				<jms:queue-consumer />
 			</jms:consumer-type>

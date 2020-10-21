@@ -60,7 +60,8 @@ fun getExperienceData(candidateReq)=
       Start_Month: item.startDate as DateTime as String {format: "MM"},
       Start_Year: item.startDate as DateTime as String {format: "yyyy"},
       End_Month: item.endDate as DateTime as String {format: "MM"},
-      End_Year: item.endDate as DateTime as String {format: "yyyy"}
+      End_Year: item.endDate as DateTime as String {format: "yyyy"},
+      Currently_Work_Here: if(now() as DateTime as String {format:"yyyy-MM-dd"} == item.endDate as DateTime as String {format:"yyyy-MM-dd"}) true else false
   } else null
  )
 
