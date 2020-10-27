@@ -41,6 +41,20 @@ fun getJobAppliedToData(candidateReq)={
 	Source_Reference: {
 		ID: candidateReq.source
 	},
+	Personal_Information_Data: {
+		(Gender_Reference: {
+			ID: vars.EEOReferencesValues.gender
+		}) if (vars.EEOReferencesValues.gender !=null),
+		(Ethnicity_Reference: {
+			ID: vars.EEOReferencesValues.race
+		}) if (vars.EEOReferencesValues.race !=null),
+		(Veterans_Status_Reference: {
+			ID: vars.EEOReferencesValues.veteran
+		}) if (vars.EEOReferencesValues.veteran !=null),
+		(Disability_Status_Reference: {
+			ID: vars.EEOReferencesValues.disability
+		}) if (vars.EEOReferencesValues.disability !=null)
+	}
 }
 fun getResumeAttachmentData(candidateReq)={
 	Filename: candidateReq.documents.resume.fileName,
@@ -141,6 +155,16 @@ vars.putCandidateRequest mapObject ((value, key) ->
 		<flow-ref doc:name="Put Candidate" doc:id="00b9c8ef-6236-4cc6-b49c-8ecbda96f05a" name="put-candidatesFlow"/>
 		<module-cb-event:send-scalyr-event eventType="responses" eventStatus="Success" doc:name="Send scalyr event" doc:id="04a13e8e-65c0-482c-b0ad-4e0adc89eabb" config-ref="Cb_event_Connector_Config" eventMsg="Candidate creation response" flowName="Candidate process request" transactionProperties="#[attributes.correlationId]" logContext="#[vars.logContext]">
 			<module-cb-event:payload ><![CDATA[#[payload]]]></module-cb-event:payload>
+		</module-cb-event:send-scalyr-event>
+		<module-cb-event:send-scalyr-event eventType="metrics" eventStatus="Success" doc:name="Send scalyr event" doc:id="f21666ae-6ef2-41b8-b88a-630f3ce88d83" config-ref="Cb_event_Connector_Config" eventMsg="Job Application Sent" flowName="Put_Candidate">
+			<module-cb-event:payload ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	message: "Application created",
+	flowName: "createApplicationFlow",
+	metricType: "ApplicationSent"
+}]]]></module-cb-event:payload>
 		</module-cb-event:send-scalyr-event>
 	</flow>
 	<flow name="put-candidatesFlow" doc:id="f3489abf-1273-463b-bc92-eea3bdcbf045" >

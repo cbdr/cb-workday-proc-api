@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="getEEOReferences" doc:id="cc51f686-c730-47d9-80b8-3475da26bbc9" >
+		<scatter-gather doc:name="Scatter-Gather" doc:id="1ef4a299-7a1e-45dd-bf89-b4e602ba8b83" >
+			<route >
+				<try doc:name="Try" doc:id="b5a215a3-3127-4c74-8caa-c604fb1b2b9e" >
+					<http:request method="GET" doc:name="Request" doc:id="22086df9-c2de-4976-aeee-1189131cc149" path="${cb-workday-sys-api.integrations.get-References-ByReferenceId}" config-ref="HTTP_Request_configuration_workday">
+				<http:headers><![CDATA[#[output application/java
+---
+{
+	"client_secret" : vars.client_secret,
+	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"client_id" : vars.client_id,
+	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
+	"userName" : p('cb-workday-sys-api.headers.userName')
+}]]]></http:headers>
+					<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"reference_id" : p('cb-workday-sys-api.gender_reference')
+}]]]></http:uri-params>
+					<http:query-params><![CDATA[#[output application/java
+---
+{
+	"pageSize" : p('cb-workday-sys-api.pageSize'),
+	"startPage": 1
+}]]]></http:query-params>
+				</http:request>
+					<ee:transform doc:name="Transform Message" doc:id="8cda1e5f-c2a9-4099-a4f0-dd281776f29c">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/xml 
+var gender= (vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Gender" )).answer
+
+---
+Gender_ID:
+    (Get_References_Response: if(gender !=null) ((payload.Get_References_Response.Response_Data filterObject ((value, key, index) -> value.Reference_ID_Data.Referenced_Object_Descriptor == gender[0])).Reference_ID.Reference_ID_Reference.*ID filter ( value, index ) -> ( value.@'type' ~= p('cb-workday-sys-api.gender_reference'))) else null)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+					<error-handler >
+						<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="a69e668f-4188-4658-97a1-26491c61f744" >
+							<ee:transform doc:name="Transform Message" doc:id="c9f0ddb5-283a-49d7-bece-b8df958d66eb" >
+								<ee:message >
+									<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+Gender_ID: null]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+						</on-error-continue>
+					</error-handler>
+				</try>
+			</route>
+			<route >
+				<try doc:name="Try" doc:id="ba136ab8-9982-4cca-95fb-2395e930b736" >
+					<http:request method="GET" doc:name="Request" doc:id="78aec93d-6588-43c8-af1c-948994a7fde0" path="${cb-workday-sys-api.integrations.get-References-ByReferenceId}" config-ref="HTTP_Request_configuration_workday">
+				<http:headers><![CDATA[#[output application/java
+---
+{
+	"client_secret" : vars.client_secret,
+	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"client_id" : vars.client_id,
+	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
+	"userName" : p('cb-workday-sys-api.headers.userName')
+}]]]></http:headers>
+					<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"reference_id" : p('cb-workday-sys-api.veteran_reference')
+}]]]></http:uri-params>
+					<http:query-params><![CDATA[#[output application/java
+---
+{
+	"pageSize" : p('cb-workday-sys-api.pageSize'),
+	"startPage": 1
+}]]]></http:query-params>
+				</http:request>
+					<ee:transform doc:name="Transform Message" doc:id="11265df6-84cd-40a9-b75b-e2d94151fede">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/xml 
+import * from dw::core::Strings
+var veteranMapping={
+   "I CHOOSE NOT TO SELF IDENTIFY" : "I DO NOT WISH TO SELF-IDENTIFY",
+   "I AM NOT A PROTECTED VETERAN":"I IDENTIFY AS A VETERAN, JUST NOT A PROTECTED VETERAN",
+   "I IDENTIFY AS ONE OR MORE OF THE CLASSIFICATIONS OF PROTECTED VETERAN LISTED ABOVE.":"I IDENTIFY AS ONE OR MORE OF THE CLASSIFICATIONS OF PROTECTED VETERANS LISTED ABOVE"
+}
+var veteran_answer= (vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Veteran" )).answer
+
+var veteran= if(veteran_answer !=null and !isEmpty(veteran_answer)) (veteranMapping[veteran_answer[0]]) else ""
+
+---
+Veteran_ID:
+    (Get_References_Response: if(veteran !=null) ((payload.Get_References_Response.Response_Data filterObject ((value, key, index) -> value.Reference_ID_Data.Referenced_Object_Descriptor == veteran)).Reference_ID.Reference_ID_Reference.*ID filter ( value, index ) -> ( value.@'type' ~= p('cb-workday-sys-api.veteran_reference'))) else null)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<error-handler >
+						<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="37dd6aae-f6f9-476f-a124-0e3ff94b4bd8" >
+							<ee:transform doc:name="Transform Message" doc:id="b834eca1-7097-431c-9f9e-234032fc33d8" >
+								<ee:message >
+									<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+Veteran_ID: null]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+						</on-error-continue>
+					</error-handler>
+				</try>
+			</route>
+			<route >
+				<try doc:name="Try" doc:id="86167606-c180-44f9-9ecb-10ecb3f2ba33" >
+					<http:request method="GET" doc:name="Request" doc:id="0db31d82-da1c-48c9-a2b5-5ce23c00deab" path="${cb-workday-sys-api.integrations.get-References-ByReferenceId}" config-ref="HTTP_Request_configuration_workday">
+				<http:headers><![CDATA[#[output application/java
+---
+{
+	"client_secret" : vars.client_secret,
+	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"client_id" : vars.client_id,
+	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
+	"userName" : p('cb-workday-sys-api.headers.userName')
+}]]]></http:headers>
+					<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"reference_id" : p('cb-workday-sys-api.ethnicity_reference')
+}]]]></http:uri-params>
+					<http:query-params><![CDATA[#[output application/java
+---
+{
+	"pageSize" : p('cb-workday-sys-api.pageSize'),
+	"startPage": 1
+}]]]></http:query-params>
+				</http:request>
+					<ee:transform doc:name="Transform Message" doc:id="c6298abe-cd63-477f-a98c-15e2e6575497">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/xml 
+import * from dw::core::Strings
+var ethnic_answer=(vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Race" )).answer
+
+var ethnic= if(ethnic_answer !=null and !isEmpty(ethnic_answer)) (trim(substringBefore(ethnic_answer[0],"(")) replace /\// with " or ") else ""
+---
+Ethnicity_ID:
+    (Get_References_Response: if(!isEmpty(ethnic)) ((payload.Get_References_Response.Response_Data filterObject ((value, key, index) -> value.Reference_ID_Data.Referenced_Object_Descriptor contains ethnic)).Reference_ID.Reference_ID_Reference.*ID filter ( value, index ) -> ( value.@'type' ~= p('cb-workday-sys-api.ethnicity_reference'))) else null)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<error-handler >
+						<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c7165904-f169-4c09-985b-872984dc6ed4" >
+							<ee:transform doc:name="Transform Message" doc:id="70e74dba-818c-40e9-acc5-1060ee3980ab" >
+								<ee:message >
+									<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+Ethnicity_ID: null]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+						</on-error-continue>
+					</error-handler>
+				</try>
+			</route>
+			<route >
+				<try doc:name="Try" doc:id="18150d11-c5e3-462d-a0a3-b91513b33412" >
+					<http:request method="GET" doc:name="Request" doc:id="881b7aa1-10c7-489d-bfec-7f407db4fc1c" path="${cb-workday-sys-api.integrations.get-References-ByReferenceId}" config-ref="HTTP_Request_configuration_workday">
+				<http:headers><![CDATA[#[output application/java
+---
+{
+	"client_secret" : vars.client_secret,
+	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"client_id" : vars.client_id,
+	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
+	"userName" : p('cb-workday-sys-api.headers.userName')
+}]]]></http:headers>
+					<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"reference_id" : p('cb-workday-sys-api.disability_reference')
+}]]]></http:uri-params>
+					<http:query-params><![CDATA[#[output application/java
+---
+{
+	"pageSize" : p('cb-workday-sys-api.pageSize'),
+	"startPage": 1
+}]]]></http:query-params>
+				</http:request>
+					<ee:transform doc:name="Transform Message" doc:id="f07ef045-d13a-42a5-8a97-93b766446b04">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/xml 
+import * from dw::core::Strings
+var disability= (vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Disability" )).answer
+
+---
+Disability_ID:
+    (Get_References_Response: if(disability !=null) ((payload.Get_References_Response.Response_Data filterObject ((value, key, index) -> value.Reference_ID_Data.Referenced_Object_Descriptor == disability[0])).Reference_ID.Reference_ID_Reference.*ID filter ( value, index ) -> ( value.@'type' ~= p('cb-workday-sys-api.disability_reference'))) else null)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<error-handler >
+						<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="64b1cfe8-95e5-4cb1-975a-6a854d4b8dcd" >
+							<ee:transform doc:name="Transform Message" doc:id="de5cac7b-14c4-4da5-a78b-9b3c332f8e4f" >
+								<ee:message >
+									<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+Disability_ID: null]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+						</on-error-continue>
+					</error-handler>
+				</try>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="881ff724-5542-4999-8431-04c9cfdb0f40" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="EEOReferencesValues" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"gender" : payload[0].typedValue.Gender_ID.Get_References_Response,
+	"veteran" : payload[1].typedValue.Veteran_ID.Get_References_Response,
+	"race" : payload[2].typedValue.Ethnicity_ID.Get_References_Response,
+	"disability" : payload[3].typedValue.Disability_ID.Get_References_Response
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="95e3a623-9aa1-45ea-bf6a-8e0851f9c7d7" message="#[payload]"/>
+	</flow>
+</mule>
