@@ -86,8 +86,8 @@ Gender_ID: null]]></ee:set-payload>
 output application/xml 
 import * from dw::core::Strings
 var veteranMapping={
-   "I CHOOSE NOT TO SELF IDENTIFY" : "I DO NOT WISH TO SELF-IDENTIFY",
-   "I AM NOT A PROTECTED VETERAN":"I IDENTIFY AS A VETERAN, JUST NOT A PROTECTED VETERAN",
+   "I CHOOSE NOT TO SELF IDENTIFY." : "I DO NOT WISH TO SELF-IDENTIFY",
+   "I AM NOT A PROTECTED VETERAN.":"I IDENTIFY AS A VETERAN, JUST NOT A PROTECTED VETERAN",
    "I IDENTIFY AS ONE OR MORE OF THE CLASSIFICATIONS OF PROTECTED VETERAN LISTED ABOVE.":"I IDENTIFY AS ONE OR MORE OF THE CLASSIFICATIONS OF PROTECTED VETERANS LISTED ABOVE"
 }
 var veteran_answer= (vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Veteran" )).answer
@@ -193,11 +193,26 @@ Ethnicity_ID: null]]></ee:set-payload>
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/xml 
 import * from dw::core::Strings
+var disabilityMapping= [
+   {
+      "cb":"YES, I HAVE A DISABILITY (or previously had a disability)",
+      "wd":"Yes, I Have A Disability, Or Have A History/Record Of Having A Disability"
+   },
+   {
+      "cb":"NO, I DON'T HAVE A DISABILITY",
+      "wd":"No, I Don't Have A Disability, Or A History/Record Of Having A Disability"
+   },
+   {
+      "cb":"I DON'T WISH TO ANSWER",
+      "wd":"I Don't Wish To Answer"
+   }
+]
 var disability= (vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Disability" )).answer
+var wd_disability = (disabilityMapping filter((item)-> item.cb == disability[0])).wd[0]
 
 ---
 Disability_ID:
-    (Get_References_Response: if(disability !=null) ((payload.Get_References_Response.Response_Data filterObject ((value, key, index) -> value.Reference_ID_Data.Referenced_Object_Descriptor == disability[0])).Reference_ID.Reference_ID_Reference.*ID filter ( value, index ) -> ( value.@'type' ~= p('cb-workday-sys-api.disability_reference'))) else null)]]></ee:set-payload>
+    (Get_References_Response: if(wd_disability !=null) ((payload.Get_References_Response.Response_Data filterObject ((value, key, index) -> value.Reference_ID_Data.Referenced_Object_Descriptor == wd_disability)).Reference_ID.Reference_ID_Reference.*ID filter ( value, index ) -> ( value.@'type' ~= p('cb-workday-sys-api.disability_reference'))) else null)]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
 				<error-handler >
