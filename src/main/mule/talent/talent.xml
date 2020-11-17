@@ -69,7 +69,7 @@ vars.originalPayload.candidate.documents.educationHistory map ((item, index) -> 
 				</choice>
 		<choice doc:name="Choice" doc:id="a5310c26-41fe-4f39-b5c6-2a7d1e1c9cac">
 					<when expression="#[(vars.originalPayload.candidate.documents.educationHistory.field !=null and !isEmpty(vars.originalPayload.candidate.documents.educationHistory.field) and vars.originalPayload.candidate.documents.educationHistory.field != 'None')]">
-						<flow-ref doc:name="Get Field of Study" doc:id="2f4cc934-f47d-4406-a07c-8d6f6ad99538" name="GetFieldOfStudy" target="fieldsData" />
+						<flow-ref doc:name="Get Field of Study" doc:id="2f4cc934-f47d-4406-a07c-8d6f6ad99538" name="GetFieldOfStudy" target="fieldsData"/>
 				<ee:transform doc:name="Transform Message" doc:id="428ca90b-99ba-4d9c-b4f4-78e2e98f7565">
 			<ee:message>
 			</ee:message>
