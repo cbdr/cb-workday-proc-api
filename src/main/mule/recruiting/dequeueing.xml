@@ -67,7 +67,7 @@ else
 			"parser": "$(Mule::p("cb-log-system-api.defaultLogContext.parser"))"
 		},
 		"gunslinger":{
-			"applinkLogDID": vars.originalPayload.candidate.accountId,
+			"applinkLogDID": vars.originalPayload.candidate.custom.LogDID,
 			"applinkDID": vars.originalPayload.configuration.id,
 			"entityLogDID": vars.originalPayload.candidate.custom.EntityLogDID
 		}

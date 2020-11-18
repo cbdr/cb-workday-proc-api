@@ -89,7 +89,7 @@
 		<dependency>
 			<groupId>ffecd84d-b280-4ef2-88b0-8eec41b65d21</groupId>
 			<artifactId>cb-event-mule-extension</artifactId>
-			<version>1.0.1</version>
+			<version>1.0.2</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>

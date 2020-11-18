@@ -9,7 +9,7 @@ http:
   requestTimeout: "60000"
 candidate-push:  
   #workday-candidate-recruiting-q: "cb.workday-candidate-recruiting-q"
-  workday-candidate-recruiting-q: "cb.workday-candidate-recruiting-q-test"
+  workday-candidate-recruiting-q: "cb.workday-candidate-recruiting-q"
   
   
 cb-workday-sys-api:

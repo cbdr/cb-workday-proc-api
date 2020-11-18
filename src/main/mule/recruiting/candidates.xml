@@ -156,15 +156,8 @@ vars.putCandidateRequest mapObject ((value, key) ->
 		<module-cb-event:send-scalyr-event eventType="responses" eventStatus="Success" doc:name="Send scalyr event" doc:id="04a13e8e-65c0-482c-b0ad-4e0adc89eabb" config-ref="Cb_event_Connector_Config" eventMsg="Candidate creation response" flowName="Candidate process request" transactionProperties="#[attributes.correlationId]" logContext="#[vars.logContext]">
 			<module-cb-event:payload ><![CDATA[#[payload]]]></module-cb-event:payload>
 		</module-cb-event:send-scalyr-event>
-		<module-cb-event:send-scalyr-event eventType="metrics" eventStatus="Success" doc:name="Send scalyr event" doc:id="f21666ae-6ef2-41b8-b88a-630f3ce88d83" config-ref="Cb_event_Connector_Config" eventMsg="Job Application Sent" flowName="Put_Candidate">
-			<module-cb-event:payload ><![CDATA[#[%dw 2.0
-output application/java
----
-{
-	message: "Application created",
-	flowName: "createApplicationFlow",
-	metricType: "ApplicationSent"
-}]]]></module-cb-event:payload>
+		<module-cb-event:send-scalyr-event eventType="metrics" eventStatus="CandidateCreated" doc:name="Send scalyr Candidate created event" doc:id="9b874193-883f-4314-8bc7-8162a7394a4a" config-ref="Cb_event_Connector_Config" eventMsg="Candidate is created" flowName="prepare-create-candidates" logContext="#[vars.logContext]"/>
+		<module-cb-event:send-scalyr-event eventType="metrics" eventStatus="ApplicationSent" doc:name="Send scalyr Application Sent event" doc:id="f21666ae-6ef2-41b8-b88a-630f3ce88d83" config-ref="Cb_event_Connector_Config" eventMsg="Job Application Sent" flowName="Put_Candidate" logContext="#[vars.logContext]">
 		</module-cb-event:send-scalyr-event>
 	</flow>
 	<flow name="put-candidatesFlow" doc:id="f3489abf-1273-463b-bc92-eea3bdcbf045" >
