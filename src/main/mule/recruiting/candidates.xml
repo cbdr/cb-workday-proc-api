@@ -65,6 +65,7 @@ fun getResumeData(candidateReq)={
 	File_Content: candidateReq.documents.resume.document,
 	(Skill_Data: getSkillsData(candidateReq.documents)) if(candidateReq.documents.skills !=null or candidateReq.documents.itSkills !=null or candidateReq.documents.softSkills !=null),
 	(Experience_Data: getExperienceData(candidateReq)) if (candidateReq.documents.workHistory.histories !=null),
+	(Certification_Data: getCertificationData(vars.certificationReferencesValues)) if (vars.certificationReferencesValues !=null and !isEmpty(vars.certificationReferencesValues)),
 	(Education_Data: if ( vars.degreefieldsResponse !=null ) getEducationData(vars.degreefieldsResponse) else if ( vars.degreeResponse !=null ) getEducationData(vars.degreeResponse) else getEducationData(candidateReq)) if (candidateReq.documents.educationHistory !=null)
 }
 fun getExperienceData(candidateReq)=
@@ -117,6 +118,12 @@ else
   [])) distinctBy $) map ((item) ->  
       Skill_Name: item 
  )
+ /*
+ * map the certification reference id and remove any duplicates
+ */
+fun getCertificationData(candidateCertificationsReq)=(
+	candidateCertificationsReq filter ((item, index) -> item.Certification_Reference_ID !=null) distinctBy $
+)
 fun getQuestionnaireData(req)=
 	(Response_Data: {
 	Questionnaire_Reference: req.Questionnaire_Reference,

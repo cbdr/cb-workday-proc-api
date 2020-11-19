@@ -20,6 +20,7 @@ cb-workday-sys-api:
   veteran_reference: "Veteran_Status_ID"
   disability_reference: "Self_Identification_of_Disability_Status_ID"
   ethnicity_reference: "Ethnicity_ID"
+  certification_reference: "Certification_ID"
   recruiting:
     create-candidates-uri: "/cb-workday-sys-api/v1/recruiting/candidates"
     get-candidates-uri: "/cb-workday-sys-api/v1/recruiting/candidates"

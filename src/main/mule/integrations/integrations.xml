@@ -5,7 +5,7 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
-	<flow name="getEEOReferences" doc:id="cc51f686-c730-47d9-80b8-3475da26bbc9" >
+	<flow name="getworkdayReferences" doc:id="cc51f686-c730-47d9-80b8-3475da26bbc9" >
 		<scatter-gather doc:name="Scatter-Gather" doc:id="1ef4a299-7a1e-45dd-bf89-b4e602ba8b83" >
 			<route >
 				<try doc:name="Try" doc:id="b5a215a3-3127-4c74-8caa-c604fb1b2b9e" >
@@ -229,6 +229,54 @@ Disability_ID: null]]></ee:set-payload>
 					</error-handler>
 				</try>
 			</route>
+			<route >
+				<try doc:name="Try" doc:id="9aecdce1-05b9-403e-96ab-e399b420e9eb" >
+					<http:request method="GET" doc:name="Request" doc:id="e2f90e01-a86e-403b-8a69-41cc3af3648a" path="${cb-workday-sys-api.integrations.get-References-ByReferenceId}" config-ref="HTTP_Request_configuration_workday">
+				<http:headers><![CDATA[#[output application/java
+---
+{
+	"client_secret" : vars.client_secret,
+	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"client_id" : vars.client_id,
+	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
+	"userName" : p('cb-workday-sys-api.headers.userName')
+}]]]></http:headers>
+					<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"reference_id" : p('cb-workday-sys-api.certification_reference')
+}]]]></http:uri-params>
+					<http:query-params><![CDATA[#[output application/java
+---
+{
+	"pageSize" : p('cb-workday-sys-api.pageSize'),
+	"startPage": 1
+}]]]></http:query-params>
+				</http:request>
+					<ee:transform doc:name="Transform Message" doc:id="77a4a70a-5336-4b48-8408-18f3b92e3031">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+(vars.originalPayload.candidate.documents.certifications map ((item, index) -> (
+    Certification_Reference_ID: ((payload.Get_References_Response.Response_Data filterObject ((value, key, index) -> value.Reference_ID_Data.Referenced_Object_Descriptor == item)).Reference_ID.Reference_ID_Reference.*ID filter (value, index) -> (value.@'type' ~= 'Certification_ID'))[0]
+  ))) filter ((item, index) -> item.Certification_Reference_ID !=null)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+					<error-handler >
+						<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="75cc30a0-ef37-4995-b5da-0f89f7c4c547" >
+							<ee:transform doc:name="Transform Message" doc:id="ac19c57b-9e95-4955-b65d-b584702314d3" >
+								<ee:message >
+									<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+[]]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+						</on-error-continue>
+					</error-handler>
+				</try>
+			</route>
 		</scatter-gather>
 		<ee:transform doc:name="Transform Message" doc:id="881ff724-5542-4999-8431-04c9cfdb0f40" >
 			<ee:message >
@@ -243,6 +291,10 @@ output application/json
 	"race" : payload[2].typedValue.Ethnicity_ID.Get_References_Response,
 	"disability" : payload[3].typedValue.Disability_ID.Get_References_Response
 }]]></ee:set-variable>
+				<ee:set-variable variableName="certificationReferencesValues" ><![CDATA[%dw 2.0
+output application/json
+---
+payload[4].typedValue filter ((item, index) -> item.Certification_Reference_ID !=null)]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="95e3a623-9aa1-45ea-bf6a-8e0851f9c7d7" message="#[payload]"/>
