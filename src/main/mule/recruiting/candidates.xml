@@ -12,7 +12,7 @@ http://www.mulesoft.org/schema/mule/module-cb-event http://www.mulesoft.org/sche
 			</ee:message>
 			<ee:variables >
 				<ee:set-variable variableName="putCandidateRequest" ><![CDATA[%dw 2.0
-output application/json skipNullOn="everywhere"
+output application/json skipNullOn = "everywhere"
 fun getNameData(candidateReq)={
 	Legal_Name: {
 		Name_Detail_Data: {
@@ -63,46 +63,67 @@ fun getResumeAttachmentData(candidateReq)={
 fun getResumeData(candidateReq)={
 	(Summary: candidateReq.documents.resume.text) if(candidateReq.documents.resume.text?),
 	File_Content: candidateReq.documents.resume.document,
+	(Skill_Data: getSkillsData(candidateReq.documents)) if(candidateReq.documents.skills !=null or candidateReq.documents.itSkills !=null or candidateReq.documents.softSkills !=null),
 	(Experience_Data: getExperienceData(candidateReq)) if (candidateReq.documents.workHistory.histories !=null),
-	(Education_Data: if(vars.degreefieldsResponse !=null) getEducationData(vars.degreefieldsResponse) else if(vars.degreeResponse !=null) getEducationData(vars.degreeResponse) else getEducationData(candidateReq)) if (candidateReq.documents.educationHistory !=null)
+	(Education_Data: if ( vars.degreefieldsResponse !=null ) getEducationData(vars.degreefieldsResponse) else if ( vars.degreeResponse !=null ) getEducationData(vars.degreeResponse) else getEducationData(candidateReq)) if (candidateReq.documents.educationHistory !=null)
 }
 fun getExperienceData(candidateReq)=
 	 candidateReq.documents.workHistory.histories map ((item) ->
-  if( item.jobTitle !=null and item.company !=null and item.startDate !=null and item.endDate !=null) {
-      Company_Name: item.company,
-      Title: if(item.jobTitle !=null)item.jobTitle else "N/A",
-      Start_Month: item.startDate as DateTime as String {format: "MM"},
-      Start_Year: item.startDate as DateTime as String {format: "yyyy"},
-      End_Month: item.endDate as DateTime as String {format: "MM"},
-      End_Year: item.endDate as DateTime as String {format: "yyyy"},
-      Currently_Work_Here: if(now() as DateTime as String {format:"yyyy-MM-dd"} == item.endDate as DateTime as String {format:"yyyy-MM-dd"}) true else false
-  } else null
+  if ( item.jobTitle !=null and item.company !=null and item.startDate !=null and item.endDate !=null ) {
+	Company_Name: item.company,
+	Title: if ( item.jobTitle !=null ) item.jobTitle else "N/A",
+	Start_Month: item.startDate as DateTime as String {
+		format: "MM"
+	},
+	Start_Year: item.startDate as DateTime as String {
+		format: "yyyy"
+	},
+	End_Month: item.endDate as DateTime as String {
+		format: "MM"
+	},
+	End_Year: item.endDate as DateTime as String {
+		format: "yyyy"
+	},
+	Currently_Work_Here: if ( now() as DateTime as String {
+		format:"yyyy-MM-dd"
+	} == item.endDate as DateTime as String {
+		format:"yyyy-MM-dd"
+	} ) true else false
+} else null
  )
-
 fun getEducationData(req)=
 	req map ((item) ->
   {
-      (School_Name: item.school) if(item.school?),
-      (Degree_Reference: {
-      	ID: item.degree
-      }) if(item.degree? and item.school?),
-      (Field_of_Study_Reference:{
-      	ID:item.field
-      }) if(item.field? and item.school?)     
-  }
- ) filter ($ != {})
-fun getSkillsData(candidateReq)=
-	 candidateReq.documents.skills map ((item) ->  
-      Skill_Name: item.company 
+	(School_Name: item.school) if(item.school?),
+	(Degree_Reference: {
+		ID: item.degree
+	}) if(item.degree? and item.school?),
+	(Field_of_Study_Reference: {
+		ID: item.field
+	}) if(item.field? and item.school?)
+}
+ ) filter ($ != {
+})
+/*
+ * Combine the softSkills,itSkills,skills from request into a single array and remove any duplicates for constructing the skills object
+ */
+fun getSkillsData(candidateSkillsReq)=
+	 (((if ( candidateSkillsReq.skills != null ) (candidateSkillsReq.skills.*skillName)
+else
+  []) ++ (if ( candidateSkillsReq.itSkills != null ) (candidateSkillsReq.itSkills)
+else
+  []) ++ (if ( candidateSkillsReq.softSkills != null ) (candidateSkillsReq.softSkills)
+else
+  [])) distinctBy $) map ((item) ->  
+      Skill_Name: item 
  )
 fun getQuestionnaireData(req)=
-	(Response_Data:{
-		Questionnaire_Reference: req.Questionnaire_Reference,
-		Questionnaire_Answer_Data: req
-  }
- )
+	(Response_Data: {
+	Questionnaire_Reference: req.Questionnaire_Reference,
+	Questionnaire_Answer_Data: req
+})
 ---
-if(vars.candidate !=null and !isEmpty(vars.candidate) and vars.jobRequisitionsDetails !=null and !isEmpty(vars.jobRequisitionsDetails)) {
+if ( vars.candidate !=null and !isEmpty(vars.candidate) and vars.jobRequisitionsDetails !=null and !isEmpty(vars.jobRequisitionsDetails) ) {
 	Candidate: {
 		Candidate_Reference: {
 			ID: vars.candidate.Candidate_Reference.ID
@@ -118,7 +139,7 @@ if(vars.candidate !=null and !isEmpty(vars.candidate) and vars.jobRequisitionsDe
 		}
 	}
 }
-else if((isEmpty(vars.candidate)  and vars.jobRequisitionsDetails !=null and !isEmpty(vars.jobRequisitionsDetails))) {
+else if ( (isEmpty(vars.candidate) and vars.jobRequisitionsDetails !=null and !isEmpty(vars.jobRequisitionsDetails)) ) {
 	Candidate: {
 		Candidate_Data: {
 			Name_Data: getNameData((vars.originalPayload.candidate)),
@@ -135,7 +156,7 @@ else {
 	Candidate: {
 		Candidate_Data: {
 			Name_Data: getNameData(vars.originalPayload.candidate),
-			Contact_Data: getContactData(vars.originalPayload.candidate)			
+			Contact_Data: getContactData(vars.originalPayload.candidate)
 		}
 	}
 }]]></ee:set-variable>
