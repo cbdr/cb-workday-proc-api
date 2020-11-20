@@ -35,7 +35,8 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/xml 
-var gender= (vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Gender" )).answer
+//var gender= (vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Gender" )).answer
+var gender= vars.originalPayload.candidate.documents.eeo.gender
 
 ---
 Gender_ID:
@@ -90,7 +91,8 @@ var veteranMapping={
    "I AM NOT A PROTECTED VETERAN.":"I IDENTIFY AS A VETERAN, JUST NOT A PROTECTED VETERAN",
    "I IDENTIFY AS ONE OR MORE OF THE CLASSIFICATIONS OF PROTECTED VETERAN LISTED ABOVE.":"I IDENTIFY AS ONE OR MORE OF THE CLASSIFICATIONS OF PROTECTED VETERANS LISTED ABOVE"
 }
-var veteran_answer= (vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Veteran" )).answer
+//var veteran_answer= (vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Veteran" )).answer
+var veteran_answer= vars.originalPayload.candidate.documents.eeo.veteran
 
 var veteran= if(veteran_answer !=null and !isEmpty(veteran_answer)) (veteranMapping[veteran_answer[0]]) else ""
 
@@ -142,7 +144,8 @@ Veteran_ID: null]]></ee:set-payload>
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/xml 
 import * from dw::core::Strings
-var ethnic_answer=(vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Race" )).answer
+//var ethnic_answer=(vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Race" )).answer
+var ethnic_answer=vars.originalPayload.candidate.documents.eeo.race
 
 var ethnic= if(ethnic_answer !=null and !isEmpty(ethnic_answer)) (trim(substringBefore(ethnic_answer[0],"(")) replace /\// with " or ") else ""
 ---
@@ -207,7 +210,9 @@ var disabilityMapping= [
       "wd":"I Don't Wish To Answer"
    }
 ]
-var disability= (vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Disability" )).answer
+//var disability= (vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Disability" )).answer
+var disability= vars.originalPayload.candidate.documents.eeo.disability
+
 var wd_disability = (disabilityMapping filter((item)-> item.cb == disability[0])).wd[0]
 
 ---
