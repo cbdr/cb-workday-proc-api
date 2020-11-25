@@ -34,6 +34,7 @@ if (getFilteredJobById !=null ) (getFilteredJobById reduce ((item, accumulator) 
 							<otherwise >
 								<flow-ref doc:name="Review Requisitions" doc:id="904e4fd4-00bf-49ad-8653-665f114b9e91" name="ReviewRequisitions" />
 								<flow-ref doc:name="get Degree and field of study reference" doc:id="c2fd75c6-4d1a-440a-abb8-4fad7aecc95e" name="getDegreesAndFieldOfStudyReferences"/>
+								<flow-ref doc:name="Get Workday Flow Reference" doc:id="74c41260-ed23-4b4e-ab3d-7af7a06581f0" name="getworkdayReferences"/>
 								<flow-ref doc:name="CreateCandidate" doc:id="01e11531-f3cd-4c4f-8d6d-24e17361c890" name="prepare-create-candidates" />
 							</otherwise>
 						</choice>
