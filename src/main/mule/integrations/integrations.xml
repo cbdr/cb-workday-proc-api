@@ -40,7 +40,7 @@ var gender= vars.originalPayload.candidate.documents.eeo.gender
 
 ---
 Gender_ID:
-    (Get_References_Response: if(gender !=null) ((payload.Get_References_Response.Response_Data filterObject ((value, key, index) -> value.Reference_ID_Data.Referenced_Object_Descriptor == gender[0])).Reference_ID.Reference_ID_Reference.*ID filter ( value, index ) -> ( value.@'type' ~= p('cb-workday-sys-api.gender_reference'))) else null)]]></ee:set-payload>
+    (Get_References_Response: if(gender !=null) ((payload.Get_References_Response.Response_Data filterObject ((value, key, index) -> value.Reference_ID_Data.Referenced_Object_Descriptor == gender)).Reference_ID.Reference_ID_Reference.*ID filter ( value, index ) -> ( value.@'type' ~= p('cb-workday-sys-api.gender_reference'))) else null)]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
 					<error-handler >
@@ -94,7 +94,7 @@ var veteranMapping={
 //var veteran_answer= (vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Veteran" )).answer
 var veteran_answer= vars.originalPayload.candidate.documents.eeo.veteran
 
-var veteran= if(veteran_answer !=null and !isEmpty(veteran_answer)) (veteranMapping[veteran_answer[0]]) else ""
+var veteran= if(veteran_answer !=null and !isEmpty(veteran_answer)) (veteranMapping[veteran_answer]) else ""
 
 ---
 Veteran_ID:
@@ -147,7 +147,7 @@ import * from dw::core::Strings
 //var ethnic_answer=(vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Race" )).answer
 var ethnic_answer=vars.originalPayload.candidate.documents.eeo.race
 
-var ethnic= if(ethnic_answer !=null and !isEmpty(ethnic_answer)) (trim(substringBefore(ethnic_answer[0],"(")) replace /\// with " or ") else ""
+var ethnic= if(ethnic_answer !=null and !isEmpty(ethnic_answer)) (trim(substringBefore(ethnic_answer,"(")) replace /\// with " or ") else ""
 ---
 Ethnicity_ID:
     (Get_References_Response: if(!isEmpty(ethnic)) ((payload.Get_References_Response.Response_Data filterObject ((value, key, index) -> value.Reference_ID_Data.Referenced_Object_Descriptor contains ethnic)).Reference_ID.Reference_ID_Reference.*ID filter ( value, index ) -> ( value.@'type' ~= p('cb-workday-sys-api.ethnicity_reference'))) else null)]]></ee:set-payload>
@@ -213,7 +213,7 @@ var disabilityMapping= [
 //var disability= (vars.originalPayload.candidate.documents.questions filter ((value) -> value.questionId =="Disability" )).answer
 var disability= vars.originalPayload.candidate.documents.eeo.disability
 
-var wd_disability = (disabilityMapping filter((item)-> item.cb == disability[0])).wd[0]
+var wd_disability = (disabilityMapping filter((item)-> item.cb == disability)).wd[0]
 
 ---
 Disability_ID:
