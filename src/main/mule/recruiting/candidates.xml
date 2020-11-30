@@ -100,8 +100,8 @@ fun getEducationData(req)=
 		ID: item.degree
 	}) if(item.degree? and item.school?),
 	(Field_of_Study_Reference: {
-		ID: item.field
-	}) if(item.field? and item.school?)
+		ID: item.major
+	}) if(item.major? and item.school?)
 }
  ) filter ($ != {
 })

@@ -44,8 +44,18 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		</http:request>
 	</flow>
 	<flow name="getDegreesAndFieldOfStudyReferences" doc:id="621a818a-f423-41f1-8327-8a79de8b87fe" >
+		<ee:transform doc:name="Transform Message" doc:id="00db44c3-d196-4044-b997-604c2ad62fd1" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="originalfilteredDegreeList" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.originalPayload.candidate.documents.educationHistory filter ((item, index) -> item.school !=null and item.degree != 'None')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
 		<choice doc:name="Choice" doc:id="e81ff88d-01e0-4a42-a532-0e929d6dfa17">
-					<when expression="#[(vars.originalPayload.candidate.documents.educationHistory.degree !=null and !isEmpty(vars.originalPayload.candidate.documents.educationHistory.degree) and vars.originalPayload.candidate.documents.educationHistory.degree != 'None')]">
+					<when expression="#[(vars.originalfilteredDegreeList !=null and !isEmpty(vars.originalfilteredDegreeList))]">
 						<flow-ref doc:name="Get Degrees" doc:id="deedcc14-fbea-4a82-9aa2-ed812ced1a4d" name="GetDegrees" target="degreeData" />
 				<ee:transform doc:name="Transform Message" doc:id="f1ee7bee-ea6c-4462-a782-e39171db5c49">
 			<ee:message>
@@ -58,7 +68,7 @@ fun getDegreeObj(inputDegree)=(
 	(vars.degreeData.Get_Degrees_Response.Response_Data.*Degree.Degree_Data filter((item, index) -> item.Description == inputDegree ))[0]
 )
 ---
-vars.originalPayload.candidate.documents.educationHistory map ((item, index) ->  item mapObject ((value, key, index) -> (key): if(key as String == 'degree') getDegreeObj(value).ID else value))
+vars.originalfilteredDegreeList map ((item, index) ->  item mapObject ((value, key, index) -> (key): if(key as String == 'degree') getDegreeObj(value).ID else value))
 ]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
@@ -68,7 +78,7 @@ vars.originalPayload.candidate.documents.educationHistory map ((item, index) -> 
 					</otherwise>
 				</choice>
 		<choice doc:name="Choice" doc:id="a5310c26-41fe-4f39-b5c6-2a7d1e1c9cac">
-					<when expression="#[(vars.originalPayload.candidate.documents.educationHistory.field !=null and !isEmpty(vars.originalPayload.candidate.documents.educationHistory.field) and vars.originalPayload.candidate.documents.educationHistory.field != 'None')]">
+					<when expression="#[(vars.originalfilteredDegreeList !=null and !isEmpty(vars.originalfilteredDegreeList))]">
 						<flow-ref doc:name="Get Field of Study" doc:id="2f4cc934-f47d-4406-a07c-8d6f6ad99538" name="GetFieldOfStudy" target="fieldsData"/>
 				<ee:transform doc:name="Transform Message" doc:id="428ca90b-99ba-4d9c-b4f4-78e2e98f7565">
 			<ee:message>
@@ -80,9 +90,9 @@ output application/json
 fun getFieldObj(inputField)=(	(vars.fieldsData.Get_Fields_Of_Study_Response.Response_Data.*Field_Of_Study.Field_Of_Study_Data filter((item, index) -> item.Name == inputField))[0]
 )
 ---
-if(vars.degreeResponse !=null) vars.degreeResponse map ((item, index) ->  item mapObject ((value, key, index) -> (key): if(key as String == 'field') getFieldObj(value).ID else value))
+if(vars.degreeResponse !=null) vars.degreeResponse map ((item, index) ->  item mapObject ((value, key, index) -> (key): if(key as String == 'major') getFieldObj(value).ID else value))
 
-else vars.originalPayload.candidate.documents.educationHistory map ((item, index) ->  item mapObject ((value, key, index) -> (key): if(key as String == 'field') getFieldObj(value).ID else value))]]></ee:set-variable>
+else vars.originalfilteredDegreeList map ((item, index) ->  item mapObject ((value, key, index) -> (key): if(key as String == 'major') getFieldObj(value).ID else value))]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 					</when>
