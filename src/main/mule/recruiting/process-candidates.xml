@@ -53,5 +53,12 @@ if (getFilteredJobById !=null ) (getFilteredJobById reduce ((item, accumulator) 
 				<logger level="INFO" doc:name="Logger" doc:id="459b621d-1681-4744-9b57-278f2e4e77a9" message="Candidate is new"/>
 			</otherwise>
 		</choice>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="65a9dba1-2260-4a11-8a2d-84d5a439885b" >
+				<module-cb-event:send-scalyr-event eventType="logentries" eventStatus="HasError" doc:name="Send scalyr event" doc:id="c72f7109-c4d6-4951-8015-e844c8b61d69" config-ref="Cb_event_Connector_Config" eventMsg="Candidate Process Flow has errors" flowName="Candidate Process Flow" logContext="#[vars.logContext]" transactionProperties="#[attributes.correlationId]">
+					<module-cb-event:payload ><![CDATA[#[error.errorMessage.payload]]]></module-cb-event:payload>
+				</module-cb-event:send-scalyr-event>
+			</on-error-propagate>
+		</error-handler>
 	</flow>
 </mule>
