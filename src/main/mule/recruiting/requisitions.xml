@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:module-cb-event="http://www.mulesoft.org/schema/mule/module-cb-event" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/module-cb-event http://www.mulesoft.org/schema/mule/module-cb-event/current/mule-module-cb-event.xsd">
 	<flow name="Get_Job_Requisitions_ByJobId" doc:id="708e1c34-bcbe-4261-bc80-5ca9a5ec4d6e" >
-	<http:request method="GET" doc:name="Get Job Requisition Request By Job Id" doc:id="78c823be-5140-4541-bacf-22088a3411db" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.recruiting.get-JobRequistions-ByJobId-uri}">
+		<module-cb-event:send-scalyr-event eventType="requests" eventStatus="Success" doc:name="Send scalyr event" doc:id="058e2930-ba67-4e82-8968-a3233d7af0e4" config-ref="Cb_event_Connector_Config" eventMsg="Get Job Requisition Request" flowName="Get_Job_Requisitions_ByJobId " transactionProperties="#[attributes.correlationId]" logContext="#[vars.logContext]">
+			<module-cb-event:payload ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+"uriParams":{
+ "job_requisitions_id" : vars.originalPayload.candidate.documents.requisition.requisitionId
+ }}]]]></module-cb-event:payload>
+		</module-cb-event:send-scalyr-event>
+		<http:request method="GET" doc:name="Get Job Requisition Request By Job Id" doc:id="78c823be-5140-4541-bacf-22088a3411db" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.recruiting.get-JobRequistions-ByJobId-uri}">
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
+	"hostName" : vars.workday_host_name,
 	"client_secret" : vars.client_secret,
-	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"password" : vars.workday_password,
 	"client_id" : vars.client_id,
-	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
-	"userName" : p('cb-workday-sys-api.headers.userName')
+	"tenantName" : vars.workday_tenant_name,
+	"userName" : vars.workday_user_name
 }]]]></http:headers>
 			<http:uri-params ><![CDATA[#[output application/java
 ---
@@ -33,17 +44,30 @@ output application/json
 payload.Get_Job_Requisitions_Response.Response_Data[0]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>	
+		<module-cb-event:send-scalyr-event eventType="responses" eventStatus="Success" doc:name="Send scalyr event" doc:id="11ba93f3-2728-4177-92f3-be2b17d0bb5d" config-ref="Cb_event_Connector_Config" eventMsg="Get Requisition Response" flowName="Get_Job_Requisitions_ByJobId " transactionProperties="#[attributes.correlationId]" logContext="#[vars.logContext]">
+			<module-cb-event:payload ><![CDATA[#[vars.jobRequisitionsDetails]]]></module-cb-event:payload>
+		</module-cb-event:send-scalyr-event>
 	</flow>
 	<flow name="Get_Evergreen_Requisitions_ByJobId" doc:id="a8d4cac9-dcec-4fa9-9668-a72d5bf88d2a" >
+	<module-cb-event:send-scalyr-event eventType="requests" eventStatus="Success" doc:name="Send scalyr event" doc:id="3db17e58-86b2-495c-9f5f-6150c32e6757" config-ref="Cb_event_Connector_Config" eventMsg="Get Evergreen Requisition Request" flowName="Get_Evergreen_Requisitions_ByJobId " transactionProperties="#[attributes.correlationId]" logContext="#[vars.logContext]">
+			<module-cb-event:payload ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+"uriParams":{
+ "evergreen_requisitions_id" : vars.originalPayload.candidate.documents.requisition.requisitionId
+ }}]]]></module-cb-event:payload>
+		</module-cb-event:send-scalyr-event>
 	<http:request method="GET" doc:name="Get Evergreen Requisition Request By Job Id" doc:id="2beb4d00-b0ac-402d-bfe1-c50d5793e045" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.recruiting.get-EvergreenRequistions-ByJobId-uri}">
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
+	"hostName" : vars.workday_host_name,
 	"client_secret" : vars.client_secret,
-	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"password" : vars.workday_password,
 	"client_id" : vars.client_id,
-	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
-	"userName" : p('cb-workday-sys-api.headers.userName')
+	"tenantName" : vars.workday_tenant_name,
+	"userName" : vars.workday_user_name
 }]]]></http:headers>
 			<http:uri-params ><![CDATA[#[output application/java
 ---
@@ -62,6 +86,9 @@ output application/json
 payload.Get_Evergreen_Requisitions_Response.Response_Data[0]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>	
+				<module-cb-event:send-scalyr-event eventType="responses" eventStatus="Success" doc:name="Send scalyr event" doc:id="731e3000-15e0-4779-be1b-8b6e56efcea1" config-ref="Cb_event_Connector_Config" eventMsg="Get Evergreen Requisition Response" flowName="Get_Evergreen_Requisitions_ByJobId " transactionProperties="#[attributes.correlationId]" logContext="#[vars.logContext]">
+			<module-cb-event:payload ><![CDATA[#[vars.jobRequisitionsDetails]]]></module-cb-event:payload>
+		</module-cb-event:send-scalyr-event>
 	</flow>
 	<flow name="ReviewRequisitions" doc:id="c5dfb3b6-aeaf-44c1-9419-5684942c1c02" >
 		<flow-ref doc:name="Get_Job_Requisitions_ByJobId" doc:id="1347f22a-0814-48ad-84b0-f92442ab955a" name="Get_Job_Requisitions_ByJobId"/>

@@ -196,24 +196,32 @@ vars.putCandidateRequest mapObject ((value, key) ->
 ---
 {
 	"client_secret" : vars.client_secret,
-	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"password" : vars.workday_password,
 	"client_id" : vars.client_id,
-	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
-	"userName" : p('cb-workday-sys-api.headers.userName')
+	"tenantName" : vars.workday_tenant_name,
+	"userName" : vars.workday_user_name,
+	"hostName" : vars.workday_host_name
 }]]]></http:headers>
 		</http:request>
 		<logger level="INFO" doc:name="Logger" doc:id="2c821632-bca8-4466-a8b9-64be1d813631" message="#[payload]"/>
 	</flow>
 	<flow name="get-candidatesFlow" doc:id="207f5b99-fcd3-4e99-be49-0bfda9a7649b" >
+		<module-cb-event:send-scalyr-event doc:name="Send scalyr event" doc:id="10b03d1d-e3a5-41a1-bb84-9757e1046745" config-ref="Cb_event_Connector_Config" eventType="logentries" eventStatus="Success" eventMsg="Get Candidate Request" flowName="get-candidatesFlow" transactionProperties="#[attributes.correlationId]" logContext="#[vars.logContext]">
+			<module-cb-event:payload ><![CDATA[#[{
+	"email" : vars.originalPayload.candidate.email[0]
+	
+	}]]]></module-cb-event:payload>
+		</module-cb-event:send-scalyr-event>
 		<http:request method="GET" doc:name="Get Candidates Request By Email" doc:id="7e59f0c8-80fa-4b09-8db4-8722075121af" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.recruiting.get-candidates-uri}">
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
+	"hostName" : vars.workday_host_name,
 	"client_secret" : vars.client_secret,
-	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"password" : vars.workday_password,
 	"client_id" : vars.client_id,
-	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
-	"userName" : p('cb-workday-sys-api.headers.userName')
+	"tenantName" : vars.workday_tenant_name,
+	"userName" : vars.workday_user_name
 }]]]></http:headers>
 			<http:query-params ><![CDATA[#[output application/java
 ---
@@ -231,5 +239,8 @@ output application/json
  if(payload.Get_Candidates_Response.Response_Data !=null ) payload.Get_Candidates_Response.Response_Data[0] else {}]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
+		<module-cb-event:send-scalyr-event doc:name="Send scalyr event" doc:id="b12ec01a-968c-4770-bf4b-6d695385389c" config-ref="Cb_event_Connector_Config" eventType="logentries" eventStatus="Success" eventMsg="Get Candidate Response" flowName="get-candidatesFlow" transactionProperties="#[attributes.correlationId]" logContext="#[vars.logContext]">
+			<module-cb-event:payload ><![CDATA[#[vars.canddiate]]]></module-cb-event:payload>
+		</module-cb-event:send-scalyr-event>
 	</flow>
 </mule>

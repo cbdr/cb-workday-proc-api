@@ -30,6 +30,22 @@ p('secure::client_id')]]></ee:set-variable>
 output application/java
 ---
 p('secure::client_secret')]]></ee:set-variable>
+<ee:set-variable variableName="workday_user_name" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.configuration.atsConfig.workday.userName]]></ee:set-variable>
+<ee:set-variable variableName="workday_password" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.configuration.atsConfig.workday.password]]></ee:set-variable>
+<ee:set-variable variableName="workday_tenant_name" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.configuration.atsConfig.workday.tenantName]]></ee:set-variable>
+<ee:set-variable variableName="workday_host_name" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.configuration.atsConfig.workday.hostName]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<!-- <flow-ref doc:name="Flow Reference to get access token" doc:id="f9fb5b9c-10cc-435c-9169-ec5910d4e264" name="gunslinger-api-get-token-config" target="accessToken" targetValue="#[payload.data.access_token]"/>
@@ -48,11 +64,11 @@ p('secure::client_secret')]]></ee:set-variable>
 				"environment" : p('gunslinger-api-config.environment')
 			}]]]></http:query-params>
 		</http:request>-->
-		<ee:transform doc:name="Transform Message" doc:id="38716de3-2397-4daf-a748-1a05c48ca2f7" >
-			<ee:message >
+		<ee:transform doc:name="Transform Message" doc:id="38716de3-2397-4daf-a748-1a05c48ca2f7">
+			<ee:message>
 			</ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="logContext" ><![CDATA[%dw 2.0
+			<ee:variables>
+				<ee:set-variable variableName="logContext"><![CDATA[%dw 2.0
 import * from dw::core::Binaries
 output application/json
 ---
@@ -75,9 +91,17 @@ else
 			</ee:variables>
 		</ee:transform>
 		<module-cb-event:send-scalyr-event doc:name="RequestEntryFlow" doc:id="16fd47cf-5020-4cca-95b5-a1a17856dd4f" config-ref="Cb_event_Connector_Config" eventType="requests" eventStatus="Success" eventMsg="Candidate dequeued" flowName="queueingFlow" transactionProperties="#[attributes.correlationId]" logContext="#[vars.logContext]">
-			<module-cb-event:payload ><![CDATA[#[payload.candidate - "documents"]]]></module-cb-event:payload>
+			<module-cb-event:payload><![CDATA[#[payload.candidate - "documents"]]]></module-cb-event:payload>
 		</module-cb-event:send-scalyr-event>
-		<flow-ref doc:name="Flow Reference to process candidates" doc:id="459f6819-0891-481d-83db-a93545046476" name="process-candidatesFlow"/>
+		<choice doc:name="Choice" doc:id="c2e4a5fd-0962-445f-9f21-8495840ed40f" >
+			<when expression="#[vars.workday_host_name !=null and vars.workday_user_name !=null and vars.workday_password !=null and vars.workday_tenant_name !=null]">
+				<flow-ref doc:name="Flow Reference to process candidates" doc:id="459f6819-0891-481d-83db-a93545046476" name="process-candidatesFlow" />
+			</when>
+			<otherwise>
+			<module-cb-event:send-scalyr-event eventType="logentries" eventStatus="Success" doc:name="logentriesFlow" doc:id="4683d3cc-e311-4c41-88a5-92a33a6827b8" config-ref="Cb_event_Connector_Config" eventMsg="Workday ATS Configuration is missing" flowName="DequeueingFlow" transactionProperties="#[attributes.correlationId]" logContext="#[vars.logContext]"/>
+		
+			</otherwise>
+		</choice>
 		<module-cb-event:send-scalyr-event eventType="close" eventStatus="Success" doc:name="closeEntryFlow" doc:id="d66cb8fc-428d-4cde-9929-2f394a98eb8c" config-ref="Cb_event_Connector_Config" eventMsg="closeStatus" flowName="queueingFlow" transactionProperties="#[attributes.correlationId]" logContext="#[vars.logContext]">
 			<module-cb-event:payload ><![CDATA[#[%dw 2.0
 output application/java

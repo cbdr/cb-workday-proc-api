@@ -11,10 +11,11 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 ---
 {
 	"client_secret" : vars.client_secret,
-	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"password" : vars.workday_password,
 	"client_id" : vars.client_id,
-	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
-	"userName" : p('cb-workday-sys-api.headers.userName')
+	"tenantName" : vars.workday_tenant_name,
+	"userName" : vars.workday_user_name,
+	"hostName" : vars.workday_host_name
 }]]]></http:headers>
 			<http:query-params ><![CDATA[#[output application/java
 ---
@@ -30,10 +31,11 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 ---
 {
 	"client_secret" : vars.client_secret,
-	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"password" : vars.workday_password,
 	"client_id" : vars.client_id,
-	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
-	"userName" : p('cb-workday-sys-api.headers.userName')
+	"tenantName" : vars.workday_tenant_name,
+	"userName" : vars.workday_user_name,
+	"hostName" : vars.workday_host_name
 }]]]></http:headers>
 			<http:query-params ><![CDATA[#[output application/java
 ---

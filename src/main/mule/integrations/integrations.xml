@@ -14,10 +14,11 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 ---
 {
 	"client_secret" : vars.client_secret,
-	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"password" : vars.workday_password,
 	"client_id" : vars.client_id,
-	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
-	"userName" : p('cb-workday-sys-api.headers.userName')
+	"tenantName" : vars.workday_tenant_name,
+	"userName" : vars.workday_user_name,
+	"hostName" : vars.workday_host_name
 }]]]></http:headers>
 					<http:uri-params><![CDATA[#[output application/java
 ---
@@ -64,10 +65,11 @@ Gender_ID: null]]></ee:set-payload>
 ---
 {
 	"client_secret" : vars.client_secret,
-	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"password" : vars.workday_password,
 	"client_id" : vars.client_id,
-	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
-	"userName" : p('cb-workday-sys-api.headers.userName')
+	"tenantName" : vars.workday_tenant_name,
+	"userName" : vars.workday_user_name,
+	"hostName" : vars.workday_host_name
 }]]]></http:headers>
 					<http:uri-params><![CDATA[#[output application/java
 ---
@@ -122,10 +124,11 @@ Veteran_ID: null]]></ee:set-payload>
 ---
 {
 	"client_secret" : vars.client_secret,
-	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"password" : vars.workday_password,
 	"client_id" : vars.client_id,
-	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
-	"userName" : p('cb-workday-sys-api.headers.userName')
+	"tenantName" : vars.workday_tenant_name,
+	"userName" : vars.workday_user_name,
+	"hostName" : vars.workday_host_name
 }]]]></http:headers>
 					<http:uri-params><![CDATA[#[output application/java
 ---
@@ -174,10 +177,11 @@ Ethnicity_ID: null]]></ee:set-payload>
 ---
 {
 	"client_secret" : vars.client_secret,
-	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"password" : vars.workday_password,
 	"client_id" : vars.client_id,
-	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
-	"userName" : p('cb-workday-sys-api.headers.userName')
+	"tenantName" : vars.workday_tenant_name,
+	"userName" : vars.workday_user_name,
+	"hostName" : vars.workday_host_name
 }]]]></http:headers>
 					<http:uri-params><![CDATA[#[output application/java
 ---
@@ -241,10 +245,11 @@ Disability_ID: null]]></ee:set-payload>
 ---
 {
 	"client_secret" : vars.client_secret,
-	"password" : p('secure::cb-workday-sys-api.headers.password'),
+	"password" : vars.workday_password,
 	"client_id" : vars.client_id,
-	"tenantName" : p('cb-workday-sys-api.headers.tenantName'),
-	"userName" : p('cb-workday-sys-api.headers.userName')
+	"tenantName" : vars.workday_tenant_name,
+	"userName" : vars.workday_user_name,
+	"hostName" : vars.workday_host_name
 }]]]></http:headers>
 					<http:uri-params><![CDATA[#[output application/java
 ---
