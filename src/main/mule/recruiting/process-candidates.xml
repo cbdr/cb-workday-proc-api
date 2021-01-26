@@ -27,7 +27,7 @@ if (getFilteredJobById !=null ) (getFilteredJobById reduce ((item, accumulator) 
 				</ee:transform>
 						<choice doc:name="Check If the candidate has already applied for this job" doc:id="207392ec-5e0d-420f-b9e2-bbef1f450009">
 							<when expression="#[vars.candidateAlreadyAppliedToJob !=null]">
-								<module-cb-event:send-scalyr-event doc:name="Send scalyr event" doc:id="28f0fe4e-324f-4da7-b274-3fcae2e1a801" config-ref="Cb_event_Connector_Config" eventType="logentries" eventStatus="Success" eventMsg="Candidate has already applied to this Job" flowName="process-candidatesFlow" transactionProperties="#[{requisitionId: vars.originialPayload.candidate.documents.requisitions.requisitionId}]">
+								<module-cb-event:send-scalyr-event doc:name="Send scalyr event" doc:id="28f0fe4e-324f-4da7-b274-3fcae2e1a801" config-ref="Cb_event_Connector_Config" eventType="logentries" eventStatus="Success" eventMsg="Candidate has already applied to this Job" flowName="process-candidatesFlow" transactionProperties="#[{requisitionId: vars.originialPayload.candidate.documents.requisitions.requisitionId}]" logContext="#[vars.logContext]">
 									<module-cb-event:payload ><![CDATA[#[vars.originalPayload.candidate - "documents"]]]></module-cb-event:payload>
 								</module-cb-event:send-scalyr-event>
 							</when>
