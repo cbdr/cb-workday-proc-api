@@ -66,7 +66,7 @@ fun getResumeData(candidateReq)={
 	(Skill_Data: getSkillsData(candidateReq.documents)) if(candidateReq.documents.skills !=null or candidateReq.documents.itSkills !=null or candidateReq.documents.softSkills !=null),
 	(Experience_Data: getExperienceData(candidateReq)) if (candidateReq.documents.workHistory.histories !=null),
 	(Certification_Data: getCertificationData(vars.certificationReferencesValues)) if (vars.certificationReferencesValues !=null and !isEmpty(vars.certificationReferencesValues)),
-	(Education_Data: if ( vars.degreefieldsResponse !=null ) getEducationData(vars.degreefieldsResponse) else if ( vars.degreeResponse !=null ) getEducationData(vars.degreeResponse) else getEducationData(candidateReq)) if (candidateReq.documents.educationHistory !=null)
+	(Education_Data: if ( vars.degreefieldsResponse !=null ) getEducationData(vars.degreefieldsResponse) else if ( vars.degreeResponse !=null ) getEducationData(vars.degreeResponse) else getEducationData(candidateReq.documents.educationHistory)) if (candidateReq.documents.educationHistory !=null)
 }
 fun getExperienceData(candidateReq)=
 	 candidateReq.documents.workHistory.histories map ((item) ->
@@ -98,10 +98,10 @@ fun getEducationData(req)=
 	(School_Name: item.school) if(item.school?),
 	(Degree_Reference: {
 		ID: item.degree
-	}) if(item.degree? and item.school?),
+	}) if(item.degree? and item.school? and item.degree != 'None' and vars.degreefieldsResponse !=null),
 	(Field_of_Study_Reference: {
 		ID: item.major
-	}) if(item.major? and item.school?)
+	}) if(item.major? and item.school? and vars.degreefieldsResponse !=null)
 }
  ) filter ($ != {
 })
