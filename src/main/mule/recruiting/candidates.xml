@@ -240,7 +240,7 @@ output application/json
 			</ee:variables>
 		</ee:transform>
 		<module-cb-event:send-scalyr-event doc:name="Send scalyr event" doc:id="b12ec01a-968c-4770-bf4b-6d695385389c" config-ref="Cb_event_Connector_Config" eventType="logentries" eventStatus="Success" eventMsg="Get Candidate Response" flowName="get-candidatesFlow" transactionProperties="#[attributes.correlationId]" logContext="#[vars.logContext]">
-			<module-cb-event:payload ><![CDATA[#[vars.canddiate]]]></module-cb-event:payload>
+			<module-cb-event:payload ><![CDATA[#[vars.candidate]]]></module-cb-event:payload>
 		</module-cb-event:send-scalyr-event>
 	</flow>
 </mule>
