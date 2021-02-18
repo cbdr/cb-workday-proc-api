@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="process-candidates-suite.xml" />
+	<munit:test name="process-candidatesFlow-test" doc:id="de475049-fae2-4aca-bb3a-3dc6823ab705" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock ValidateRequisition" doc:id="1d13f528-4080-4fd0-beb7-1e9ccfa97581" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="43af006e-2c3b-432e-8ec3-6620e0f98fa0" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/xml --- readUrl('classpath://processcandidatesFlowtest/mock_payload.dwl')]" mediaType="application/xml" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://processcandidatesFlowtest/mock_attributes.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="jobRequisitionsDetails" value="#[output application/json --- readUrl('classpath://processcandidatesFlowtest/mock_variable_.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="candidate" value="#[output application/json --- readUrl('classpath://processcandidatesFlowtest/mock_variable_1.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="originalPayload" value="#[output application/json --- readUrl('classpath://processcandidatesFlowtest/mock_variable_2.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="client_secret" value="#[output application/java --- readUrl('classpath://processcandidatesFlowtest/mock_variable_3.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="client_id" value="#[output application/java --- readUrl('classpath://processcandidatesFlowtest/mock_variable_4.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Flow Reference" doc:id="7e667582-292d-49a9-91bc-4ca561f95c61" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="4fd94623-69aa-4c3b-9055-9d49e4584d2b" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/xml --- readUrl('classpath://processcandidatesFlowtest/mock_payload1.dwl')]" mediaType="application/xml" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://processcandidatesFlowtest/mock_attributes1.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="jobRequisitionsDetails" value="#[output application/json --- readUrl('classpath://processcandidatesFlowtest/mock_variable_5.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="candidate" value="#[output application/json --- readUrl('classpath://processcandidatesFlowtest/mock_variable_6.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="originalPayload" value="#[output application/json --- readUrl('classpath://processcandidatesFlowtest/mock_variable_7.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="degreeResponse" value="#[output application/json --- readUrl('classpath://processcandidatesFlowtest/mock_variable_8.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="client_secret" value="#[output application/java --- readUrl('classpath://processcandidatesFlowtest/mock_variable_9.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="degreeData" value="#[output application/xml --- readUrl('classpath://processcandidatesFlowtest/mock_variable_10.dwl')]" mediaType="application/xml" encoding="UTF-8" />
+						<munit-tools:variable key="client_id" value="#[output application/java --- readUrl('classpath://processcandidatesFlowtest/mock_variable_11.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Get Candidates By Email" doc:id="fa5bb40f-d3e7-439c-ad64-9ccd8cddc415" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="ae034798-e74a-4ab5-94ac-3c05ef87fcce" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/xml --- readUrl('classpath://processcandidatesFlowtest/mock_payload2.dwl')]" mediaType="application/xml" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://processcandidatesFlowtest/mock_attributes2.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="candidate" value="#[output application/json --- readUrl('classpath://processcandidatesFlowtest/mock_variable_12.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="originalPayload" value="#[output application/json --- readUrl('classpath://processcandidatesFlowtest/mock_variable_13.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="client_secret" value="#[output application/java --- readUrl('classpath://processcandidatesFlowtest/mock_variable_14.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="client_id" value="#[output application/java --- readUrl('classpath://processcandidatesFlowtest/mock_variable_15.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock CreateCandidate" doc:id="2e210c82-a95c-4651-9c84-468b5b376082" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="8bd84c13-d489-4491-81c2-d854360a6344" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/xml --- readUrl('classpath://processcandidatesFlowtest/mock_payload3.dwl')]" mediaType="application/xml" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://processcandidatesFlowtest/mock_attributes3.dwl')]" mediaType="application/json" />
+					<munit-tools:variables >
+						<munit-tools:variable key="jobRequisitionsDetails" value="#[output application/json --- readUrl('classpath://processcandidatesFlowtest/mock_variable_16.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="candidate" value="#[output application/json --- readUrl('classpath://processcandidatesFlowtest/mock_variable_17.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="originalPayload" value="#[output application/json --- readUrl('classpath://processcandidatesFlowtest/mock_variable_18.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="putCandidateRequest" value="#[output application/json skipNullOn=&quot;everywhere&quot; --- readUrl('classpath://processcandidatesFlowtest/mock_variable_19.dwl')]" mediaType="application/json"  encoding="UTF-8" />
+						<munit-tools:variable key="degreeResponse" value="#[output application/json --- readUrl('classpath://processcandidatesFlowtest/mock_variable_20.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="client_secret" value="#[output application/java --- readUrl('classpath://processcandidatesFlowtest/mock_variable_21.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="degreeData" value="#[output application/xml --- readUrl('classpath://processcandidatesFlowtest/mock_variable_22.dwl')]" mediaType="application/xml" encoding="UTF-8" />
+						<munit-tools:variable key="client_id" value="#[output application/java --- readUrl('classpath://processcandidatesFlowtest/mock_variable_23.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="92c60bd4-40af-47dc-a3e0-f03b42960b73" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://processcandidatesFlowtest/set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[output application/java --- readUrl('classpath://processcandidatesFlowtest/set-event_attributes.dwl')]" mediaType="application/java" />
+				<munit:variables >
+					<munit:variable key="originalPayload" value="#[output application/json --- readUrl('classpath://processcandidatesFlowtest/set-event_variable_.dwl')]" encoding="UTF-8" mediaType="application/json" />
+					<munit:variable key="client_secret" value="#[output application/java --- readUrl('classpath://processcandidatesFlowtest/set-event_variable_1.dwl')]" encoding="UTF-8" mediaType="application/java" />
+					<munit:variable key="client_id" value="#[output application/java --- readUrl('classpath://processcandidatesFlowtest/set-event_variable_2.dwl')]" encoding="UTF-8" mediaType="application/java" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to process-candidatesFlow" doc:id="490ba203-bfc2-4a0e-9170-260bf2815d72" name="process-candidatesFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="7115c450-7083-4fae-9001-3cdbaf26120e" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import processcandidatesFlowtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			
+			
+		</munit:validation>
+	</munit:test>
+
+</mule>

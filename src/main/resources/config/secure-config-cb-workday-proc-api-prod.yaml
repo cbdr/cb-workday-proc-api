@@ -1,0 +1,8 @@
+jwt-signature:
+  signature: "![+7jgdDIxdq2tHdwrPtmuifF5760yBXDuN2f0iE/h1FmzFGg+Gm7hNTORiocctoSXipaaLzZhwcKCGGlg2+GipWA0OefDSGvPNfyOQtOMN9JnG8xAbHWDyKFIZ+K+1HeJ]"
+cb-workday-sys-api:
+  headers:
+    password: "![NntQcX1XErDW9hIe+XS93vWZknxEmxpF5uk6sZdBHDY=]"
+
+client_id: "![WtV+M+NbH1+khT9zaUMvByLCLexIA6v7Bt9oRYY18/Zb8SvSeIrp1uPdGxCF1Ak4]"
+client_secret: "![D4f4Urhh8thyCyHMhv2xdQpKAE4ENBOxL6tUphVkHfuKQ3CdjjJdUwIe40ip2OMs]"

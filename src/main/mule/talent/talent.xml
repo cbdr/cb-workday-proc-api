@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="GetDegrees" doc:id="f2e03589-1441-4f27-8efb-a73186847152" >
+		<http:request method="GET" doc:name="Request" doc:id="4696a354-7954-43a5-b8bb-4312ed40be70" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.talent.get-degrees-uri}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : vars.client_secret,
+	"password" : vars.workday_password,
+	"client_id" : vars.client_id,
+	"tenantName" : vars.workday_tenant_name,
+	"userName" : vars.workday_user_name,
+	"hostName" : vars.workday_host_name
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"pageSize" : p('cb-workday-sys-api.pageSize'),
+	"startPage" : 1
+}]]]></http:query-params>
+		</http:request>
+	</flow>
+	<flow name="GetFieldOfStudy" doc:id="bfb32cb0-0c20-4ab0-b102-4ed1eced0c96" >
+		<http:request method="GET" doc:name="Request" doc:id="318ab654-8591-4959-8cc5-5e09a8466c80" config-ref="HTTP_Request_configuration_workday" path="${cb-workday-sys-api.talent.get-field-of-studies-uri}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : vars.client_secret,
+	"password" : vars.workday_password,
+	"client_id" : vars.client_id,
+	"tenantName" : vars.workday_tenant_name,
+	"userName" : vars.workday_user_name,
+	"hostName" : vars.workday_host_name
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"pageSize" : p('cb-workday-sys-api.pageSize'),
+	"startPage" : 1
+}]]]></http:query-params>
+		</http:request>
+	</flow>
+	<flow name="getDegreesAndFieldOfStudyReferences" doc:id="621a818a-f423-41f1-8327-8a79de8b87fe" >
+		<ee:transform doc:name="Transform Message" doc:id="00db44c3-d196-4044-b997-604c2ad62fd1" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="originalfilteredDegreeList" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.originalPayload.candidate.documents.educationHistory filter ((item, index) -> item.school !=null and item.degree != 'None')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="e81ff88d-01e0-4a42-a532-0e929d6dfa17">
+					<when expression="#[(vars.originalfilteredDegreeList !=null and !isEmpty(vars.originalfilteredDegreeList))]">
+						<flow-ref doc:name="Get Degrees" doc:id="deedcc14-fbea-4a82-9aa2-ed812ced1a4d" name="GetDegrees" target="degreeData" />
+				<ee:transform doc:name="Transform Message" doc:id="f1ee7bee-ea6c-4462-a782-e39171db5c49">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="degreeResponse"><![CDATA[%dw 2.0
+output application/json
+
+fun getDegreeObj(inputDegree)=(
+	(vars.degreeData.Get_Degrees_Response.Response_Data.*Degree.Degree_Data filter((item, index) -> item.Description == inputDegree ))[0]
+)
+---
+vars.originalfilteredDegreeList map ((item, index) ->  item mapObject ((value, key, index) -> (key): if(key as String == 'degree') getDegreeObj(value).ID else value))
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+					</when>
+					<otherwise>
+						<logger level="INFO" doc:name="Logger" doc:id="ab91601d-85ad-46a7-8d87-6ac768fd34ea" message="No Degree Data in the input" />
+					</otherwise>
+				</choice>
+		<choice doc:name="Choice" doc:id="a5310c26-41fe-4f39-b5c6-2a7d1e1c9cac">
+					<when expression="#[(vars.originalfilteredDegreeList !=null and !isEmpty(vars.originalfilteredDegreeList))]">
+						<flow-ref doc:name="Get Field of Study" doc:id="2f4cc934-f47d-4406-a07c-8d6f6ad99538" name="GetFieldOfStudy" target="fieldsData"/>
+				<ee:transform doc:name="Transform Message" doc:id="428ca90b-99ba-4d9c-b4f4-78e2e98f7565">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+						<ee:set-variable variableName="degreeFieldsResponse" ><![CDATA[%dw 2.0
+output application/json
+
+fun getFieldObj(inputField)=(	(vars.fieldsData.Get_Fields_Of_Study_Response.Response_Data.*Field_Of_Study.Field_Of_Study_Data filter((item, index) -> item.Name == inputField))[0]
+)
+---
+if(vars.degreeResponse !=null) vars.degreeResponse map ((item, index) ->  item mapObject ((value, key, index) -> (key): if(key as String == 'major') getFieldObj(value).ID else value))
+
+else vars.originalfilteredDegreeList map ((item, index) ->  item mapObject ((value, key, index) -> (key): if(key as String == 'major') getFieldObj(value).ID else value))]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+					</when>
+					<otherwise>
+						<logger level="INFO" doc:name="Logger" doc:id="8c34d396-6151-40dd-a185-bd68f76d687e" message="No Field of Study in the input" />
+					</otherwise>
+				</choice>
+	</flow>
+</mule>

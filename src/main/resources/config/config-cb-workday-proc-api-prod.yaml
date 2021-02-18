@@ -1,0 +1,40 @@
+api:
+  id: "123"
+  name: "cb-workday-proc-api"
+  version: "v1"
+  host: "eai.careerbuilder.com"
+  port: "443"
+http:
+  protocol: "HTTPS"
+  requestTimeout: "60000"
+candidate-push:  
+  workday-candidate-recruiting-q: "cb.workday-candidate-recruiting-q"
+  
+  
+cb-workday-sys-api:
+  headers:
+    userName: "cb_integration_user"
+    tenantName: "broadbean_dpt2"
+  pageSize: "999"
+  gender_reference: "Gender_Code"
+  veteran_reference: "Veteran_Status_ID"
+  disability_reference: "Self_Identification_of_Disability_Status_ID"
+  ethnicity_reference: "Ethnicity_ID"
+  certification_reference: "Certification_ID"
+  recruiting:
+    create-candidates-uri: "/cb-workday-sys-api/v1/recruiting/candidates"
+    get-candidates-uri: "/cb-workday-sys-api/v1/recruiting/candidates"
+    get-JobRequistions-uri: "/cb-workday-sys-api/v1/recruiting/job-requisitions"
+    get-JobRequistions-ByJobId-uri: "/cb-workday-sys-api/v1/recruiting/job-requisitions/{job_requisitions_id}"
+    get-EvergreenRequistions-uri: "/cb-workday-sys-api/v1/recruiting/evergreen-requisitions"
+    get-EvergreenRequistions-ByJobId-uri: "/cb-workday-sys-api/v1/recruiting/evergreen-requisitions/{evergreen_requisitions_id}"
+  talent:
+    get-degrees-uri: "/cb-workday-sys-api/v1/talent/degrees"
+    get-field-of-studies-uri: "/cb-workday-sys-api/v1/talent/field-of-studies"
+  integrations:
+    get-References-ByReferenceId: "/cb-workday-sys-api/v1/integrations/references/{reference_id}"
+gunslinger-api:
+  host: "api.careerbuilder.com"
+  port: "443"
+  createTokenUri: "/oauth/token"
+  postgeoenricher: "/core/jobs/geoenricher"
