@@ -214,6 +214,14 @@ vars.putCandidateRequest mapObject ((value, key) ->
 			</http:response-validator>
 		</http:request>
 		<logger level="INFO" doc:name="Logger" doc:id="2c821632-bca8-4466-a8b9-64be1d813631" message="#[payload]"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="559f2480-88f9-4063-96b6-db7c6246aa6d" type="HTTP:INTERNAL_SERVER_ERROR" when='#[error.exception.errorMessage.payload.errorMessage.message contains "Validation"]'>
+				<logger level="DEBUG" doc:name="Logger" doc:id="942d2d8b-1718-4369-89d8-6a8a3d522469" message="#[error.exception.errorMessage.payload]"/>
+				<module-cb-event:send-scalyr-event eventType="logentries" eventStatus="HasError" doc:name="Send scalyr event" doc:id="4de609c8-db8d-4243-b6de-422d1e8e1047" config-ref="Cb_event_Connector_Config" eventMsg="Candidate Process Flow has errors" flowName="Candidate Process Flow" logContext="#[vars.logContext]" transactionProperties="#[attributes.correlationId]">
+					<module-cb-event:payload><![CDATA[#[error.exception.errorMessage.payload]]]></module-cb-event:payload>
+				</module-cb-event:send-scalyr-event>
+			</on-error-continue>
+		</error-handler>
 	</flow>
 	<flow name="get-candidatesFlow" doc:id="207f5b99-fcd3-4e99-be49-0bfda9a7649b" >
 		<module-cb-event:send-scalyr-event doc:name="Send scalyr event" doc:id="10b03d1d-e3a5-41a1-bb84-9757e1046745" config-ref="Cb_event_Connector_Config" eventType="logentries" eventStatus="Success" eventMsg="Get Candidate Request" flowName="get-candidatesFlow" transactionProperties="#[attributes.correlationId]" logContext="#[vars.logContext]">
